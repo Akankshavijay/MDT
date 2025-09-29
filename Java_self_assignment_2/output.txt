@@ -1,0 +1,9 @@
+AGV{id=Forklift, batteryLoad=90.0, consumption=0.12, chargingTime=45, position=Station, maxspeed=2.5, actspeed=2.0}
+AGV{id=PalletMover, batteryLoad=80.0, consumption=0.1, chargingTime=30, position=Robot, maxspeed=2.8, actspeed=2.2}
+AGV{id=ConveyorBot, batteryLoad=75.0, consumption=0.14, chargingTime=50, position=Belt, maxspeed=3.0, actspeed=2.7}
+IOperation{id=TRANSPORT, description=Move load to storage, nominalTime=40, resources=[PalletMover, ConveyorBot]}
+IOperation{id=LOAD, description=Load onto trucks, nominalTime=25, resources=[Forklift, PalletMover]}
+IOperation{id=SORT, description=Deliver load at destination, nominalTime=15, resources=[Forklift]}
+IndustrialProcess{id=WAREHOUSE, operations=3, durationMinutes=80, uniqueAGVs=3}
+Total Duration (minutes): 80
+Unique AGVs Required    : 3

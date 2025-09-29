@@ -1,5 +1,3 @@
-package Aissignment_task_2_3;
-
 public class prime {
 
 	public static void main(String[] args)

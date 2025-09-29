@@ -5,6 +5,6 @@
 	<classpathentry kind="src" path="Java_self_assignment_1/Task_2"/>
 	<classpathentry kind="src" path="Java_self_assignment_1/Task_3"/>
 	<classpathentry kind="src" path="Java_self_assignment_1/Task_4"/>
-	<classpathentry kind="src" path="Java_self_assignment_2/Task"/>
+	<classpathentry kind="src" path="Java_self_assignment_2/"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

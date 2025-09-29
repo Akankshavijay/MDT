@@ -1,5 +1,3 @@
-package Assignment;
-
 public class AGV {
 
     private String id;

@@ -1,5 +1,3 @@
-package Assignment;
-
 public class IndusSimulation {
 	    public static void main(String[] args) {
 	        // Robotic Objects
