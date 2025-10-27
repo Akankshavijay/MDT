@@ -83,4 +83,22 @@ public class WarehouseException {
 
      }
  }
+ 
+ public static class InvalidTaskException extends Exception {
+     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	 public InvalidTaskException(String msg) { super(msg); }
+ }
+
+ public static class BinNotFoundException extends Exception {
+     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	 public BinNotFoundException(String msg) { super(msg); }
+ }
 }

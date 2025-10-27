@@ -1,0 +1,5 @@
+22:20:45.493924300 - Storage system initialized with max bins: 3
+22:20:45.493924300 - Added bin: X1 (Total bins: 1)
+22:20:45.495322700 - Added bin: X2 (Total bins: 2)
+22:20:45.495322700 - Added bin: X3 (Total bins: 3)
+22:20:45.497330600 - Cannot add bin 'X4' — warehouse at full capacity (3)

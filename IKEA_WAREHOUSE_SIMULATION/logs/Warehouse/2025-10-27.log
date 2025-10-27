@@ -1,0 +1,61 @@
+22:25:29.315777100 - Storage system initialized with max bins: 3
+22:25:29.315777100 - Added bin: X1 (Total bins: 1)
+22:25:29.316776300 - Added bin: X2 (Total bins: 2)
+22:25:29.316776300 - Added bin: X3 (Total bins: 3)
+22:25:29.317775 - Cannot add bin 'X4' — warehouse at full capacity (3)
+22:42:39.820981 - Storage system initialized with max bins: 3
+22:42:39.820981 - Added bin: X1 (Total bins: 1)
+22:42:39.821974200 - Bin X1 location: (41,14), Distance to Entry=16.65m, Distance to Exit=23.25m
+22:42:39.821974200 - Added bin: X2 (Total bins: 2)
+22:42:39.822980100 - Bin X2 location: (2,6), Distance to Entry=24.79m, Distance to Exit=17.84m
+22:42:39.822980100 - Added bin: X3 (Total bins: 3)
+22:42:39.822980100 - Bin X3 location: (7,18), Distance to Entry=22.37m, Distance to Exit=5.54m
+22:42:39.825440500 - Cannot add bin 'X4' — warehouse at full capacity (3)
+22:46:32.272348200 - Storage system initialized with max bins: 3
+22:46:32.272348200 - Added bin: X1 (Total bins: 1)
+22:46:32.273347 - Bin X1 location: (49,30), Distance to Entry=57.45m, Distance to Exit=20.02m
+22:46:32.273347 - Added bin: X2 (Total bins: 2)
+22:46:32.274348100 - Bin X2 location: (41,31), Distance to Entry=51.40m, Distance to Exit=21.02m
+22:46:32.274348100 - Added bin: X3 (Total bins: 3)
+22:46:32.274348100 - Bin X3 location: (8,19), Distance to Entry=20.62m, Distance to Exit=52.20m
+22:46:32.276348400 - Cannot add bin 'X4' — warehouse at full capacity (3)
+22:52:20.678867400 - Storage system initialized with max bins: 3
+22:52:20.678867400 - Added bin: X1 (Total bins: 1)
+22:52:20.679866500 - Bin X1 location: (25,30), Distance to Entry=30.81m, Distance to Exit=52.50m
+22:52:20.679866500 - Added bin: X2 (Total bins: 2)
+22:52:20.679866500 - Bin X2 location: (63,68), Distance to Entry=84.29m, Distance to Exit=55.32m
+22:52:20.680863800 - Added bin: X3 (Total bins: 3)
+22:52:20.680863800 - Bin X3 location: (85,27), Distance to Entry=86.31m, Distance to Exit=92.66m
+22:52:20.681862900 - Cannot add bin 'X4' — warehouse at full capacity (3)
+22:54:54.144836800 - Storage system initialized with max bins: 3
+22:54:54.146262300 - Added bin: X1 (Total bins: 1)
+22:54:54.146262300 - Bin X1 location: (25,84), Distance to Entry=14.04m, Distance to Exit=48.17m
+22:54:54.146262300 - Added bin: X2 (Total bins: 2)
+22:54:54.147646900 - Bin X2 location: (55,50), Distance to Entry=56.08m, Distance to Exit=2.83m
+22:54:54.147646900 - Added bin: X3 (Total bins: 3)
+22:54:54.147646900 - Bin X3 location: (61,10), Distance to Entry=94.70m, Distance to Exit=38.21m
+22:54:54.149660200 - Cannot add bin 'X4' — warehouse at full capacity (3)
+23:06:09.807470100 - Storage system initialized with max bins: 3
+23:06:09.808472 - Added bin: X1 (Total bins: 1)
+23:06:09.809470600 - Bin X1 location: (71,36), Distance to Entry=60.21m, Distance to Exit=76.61m
+23:06:09.810473800 - Added bin: X2 (Total bins: 2)
+23:06:09.811470400 - Bin X2 location: (40,94), Distance to Entry=53.85m, Distance to Exit=33.62m
+23:06:09.811470400 - Added bin: X3 (Total bins: 3)
+23:06:09.812468800 - Bin X3 location: (14,7), Distance to Entry=41.05m, Distance to Exit=74.17m
+23:06:09.813469500 - Cannot add bin 'X4' — warehouse at full capacity (3)
+23:07:24.265321100 - Storage system initialized with max bins: 3
+23:07:24.266321800 - Added bin: X1 (Total bins: 1)
+23:07:24.267318400 - Bin X1 location: (43,26), Distance to Entry=44.28m, Distance to Exit=61.85m
+23:07:24.268322 - Added bin: X2 (Total bins: 2)
+23:07:24.268322 - Bin X2 location: (67,50), Distance to Entry=77.10m, Distance to Exit=64.88m
+23:07:24.269327 - Added bin: X3 (Total bins: 3)
+23:07:24.270530600 - Bin X3 location: (56,42), Distance to Entry=63.51m, Distance to Exit=59.41m
+23:07:24.272533900 - Cannot add bin 'X4' — warehouse at full capacity (3)
+23:28:56.883679300 - Storage system initialized with max bins: 3
+23:28:56.884678800 - Added bin: X1 (Total bins: 1)
+23:28:56.885680300 - Bin X1 location: (76,10), Distance to Entry=61.40m, Distance to Exit=106.08m
+23:28:56.885680300 - Added bin: X2 (Total bins: 2)
+23:28:56.887191700 - Bin X2 location: (92,65), Distance to Entry=84.08m, Distance to Exit=93.94m
+23:28:56.888217 - Added bin: X3 (Total bins: 3)
+23:28:56.888217 - Bin X3 location: (33,21), Distance to Entry=17.09m, Distance to Exit=71.12m
+23:28:56.890203700 - Cannot add bin 'X4' — warehouse at full capacity (3)

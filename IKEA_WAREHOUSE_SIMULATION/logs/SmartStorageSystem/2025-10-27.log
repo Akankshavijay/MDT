@@ -1,0 +1,120 @@
+22:20:45.423041600 - Storage system initialized with max bins: 5
+22:20:45.437563300 - Added bin: B1 (Total bins: 1)
+22:20:45.438573600 - Added bin: B2 (Total bins: 2)
+22:20:45.438573600 - Added bin: B3 (Total bins: 3)
+22:20:45.441572100 - Stored Item{I001, type=Chair} in bin B1
+22:20:45.441572100 - Stored Item{I002, type=Table} in bin B2
+22:20:45.442571800 - Stored Item{I003, type=Sofa} in bin B3
+22:20:45.443573500 - Removed item from bin B1
+22:20:45.444570600 - Removed item from bin B2
+22:20:45.444570600 - Removed item from bin B3
+22:20:45.492906900 - Simulated stream data exchange: [SimulatedTask1, SimulatedTask2, SimulatedTask3]
+22:25:29.249650300 - Storage system initialized with max bins: 5
+22:25:29.265376300 - Added bin: B1 (Total bins: 1)
+22:25:29.265376300 - Added bin: B2 (Total bins: 2)
+22:25:29.266379200 - Added bin: B3 (Total bins: 3)
+22:25:29.268730700 - Stored Item{I001, type=Chair} in bin B1
+22:25:29.268730700 - Stored Item{I002, type=Table} in bin B2
+22:25:29.268730700 - Stored Item{I003, type=Sofa} in bin B3
+22:25:29.270737200 - Removed item from bin B1
+22:25:29.270737200 - Removed item from bin B2
+22:25:29.271738300 - Removed item from bin B3
+22:25:29.313766900 - stream data exchange: [Task1, Task2, Task3]
+22:42:39.728891200 - Storage system initialized with max bins: 5
+22:42:39.743828300 - Added bin: B1 (Total bins: 1)
+22:42:39.766636700 - Bin B1 location: (45,49), Distance to Entry=20.32m, Distance to Exit=7.71m
+22:42:39.766636700 - Added bin: B2 (Total bins: 2)
+22:42:39.767638300 - Bin B2 location: (11,20), Distance to Entry=17.73m, Distance to Exit=18.76m
+22:42:39.767638300 - Added bin: B3 (Total bins: 3)
+22:42:39.767638300 - Bin B3 location: (48,2), Distance to Entry=17.81m, Distance to Exit=7.62m
+22:42:39.770636700 - Stored Item{I001, type=Chair} in bin B1
+22:42:39.771639200 - Stored Item{I002, type=Table} in bin B2
+22:42:39.771639200 - Stored Item{I003, type=Sofa} in bin B3
+22:42:39.773143 - Removed item from bin B1
+22:42:39.774146900 - Removed item from bin B2
+22:42:39.774146900 - Removed item from bin B3
+22:42:39.819974600 - stream data exchange: [Task1, Task2, Task3]
+22:46:32.185173 - Storage system initialized with max bins: 5
+22:46:32.199711100 - Added bin: B1 (Total bins: 1)
+22:46:32.221983100 - Bin B1 location: (19,15), Distance to Entry=24.21m, Distance to Exit=46.75m
+22:46:32.221983100 - Added bin: B2 (Total bins: 2)
+22:46:32.222982100 - Bin B2 location: (44,3), Distance to Entry=44.10m, Distance to Exit=47.38m
+22:46:32.222982100 - Added bin: B3 (Total bins: 3)
+22:46:32.222982100 - Bin B3 location: (20,18), Distance to Entry=26.91m, Distance to Exit=43.86m
+22:46:32.225980400 - Stored Item{I001, type=Chair} in bin B1
+22:46:32.225980400 - Stored Item{I002, type=Table} in bin B2
+22:46:32.225980400 - Stored Item{I003, type=Sofa} in bin B3
+22:46:32.228450100 - Removed item from bin B1
+22:46:32.228450100 - Removed item from bin B2
+22:46:32.228450100 - Removed item from bin B3
+22:46:32.271348100 - stream data exchange: [Task1, Task2, Task3]
+22:52:20.591149900 - Storage system initialized with max bins: 5
+22:52:20.604084800 - Added bin: B1 (Total bins: 1)
+22:52:20.628211 - Bin B1 location: (40,72), Distance to Entry=30.02m, Distance to Exit=28.32m
+22:52:20.628211 - Added bin: B2 (Total bins: 2)
+22:52:20.629209600 - Bin B2 location: (49,51), Distance to Entry=13.45m, Distance to Exit=41.76m
+22:52:20.629209600 - Added bin: B3 (Total bins: 3)
+22:52:20.629209600 - Bin B3 location: (73,79), Distance to Entry=50.25m, Distance to Exit=16.97m
+22:52:20.631211100 - Stored Item{I001, type=Chair} in bin B1
+22:52:20.632209300 - Stored Item{I002, type=Table} in bin B2
+22:52:20.632209300 - Stored Item{I003, type=Sofa} in bin B3
+22:52:20.634302 - Removed item from bin B1
+22:52:20.634302 - Removed item from bin B2
+22:52:20.634302 - Removed item from bin B3
+22:52:20.676208300 - stream data exchange: [Task1, Task2, Task3]
+22:54:54.053950100 - Storage system initialized with max bins: 5
+22:54:54.069370500 - Added bin: B1 (Total bins: 1)
+22:54:54.091595500 - Bin B1 location: (13,69), Distance to Entry=15.23m, Distance to Exit=13.00m
+22:54:54.092593900 - Added bin: B2 (Total bins: 2)
+22:54:54.092593900 - Bin B2 location: (42,28), Distance to Entry=35.47m, Distance to Exit=27.66m
+22:54:54.093602 - Added bin: B3 (Total bins: 3)
+22:54:54.093602 - Bin B3 location: (68,98), Distance to Entry=46.39m, Distance to Exit=72.67m
+22:54:54.095109700 - Stored Item{I001, type=Chair} in bin B1
+22:54:54.096121100 - Stored Item{I002, type=Table} in bin B2
+22:54:54.096121100 - Stored Item{I003, type=Sofa} in bin B3
+22:54:54.098117500 - Removed item from bin B1
+22:54:54.098117500 - Removed item from bin B2
+22:54:54.098117500 - Removed item from bin B3
+22:54:54.144836800 - stream data exchange: [Task1, Task2, Task3]
+23:06:09.657573400 - Storage system initialized with max bins: 5
+23:06:09.681587400 - Added bin: B1 (Total bins: 1)
+23:06:09.718936300 - Bin B1 location: (37,3), Distance to Entry=68.01m, Distance to Exit=29.41m
+23:06:09.718936300 - Added bin: B2 (Total bins: 2)
+23:06:09.719934400 - Bin B2 location: (20,92), Distance to Entry=26.40m, Distance to Exit=66.31m
+23:06:09.720934900 - Added bin: B3 (Total bins: 3)
+23:06:09.721933400 - Bin B3 location: (38,27), Distance to Entry=44.05m, Distance to Exit=8.94m
+23:06:09.727935 - Stored Item{I001, type=Chair} in bin B1
+23:06:09.727935 - Stored Item{I002, type=Table} in bin B2
+23:06:09.728937100 - Stored Item{I003, type=Sofa} in bin B3
+23:06:09.731935300 - Removed item from bin B1
+23:06:09.732935300 - Removed item from bin B2
+23:06:09.732935300 - Removed item from bin B3
+23:06:09.806470900 - stream data exchange: [Task1, Task2, Task3]
+23:07:24.080259400 - Storage system initialized with max bins: 5
+23:07:24.122258400 - Added bin: B1 (Total bins: 1)
+23:07:24.160267300 - Bin B1 location: (33,7), Distance to Entry=48.60m, Distance to Exit=68.00m
+23:07:24.161266500 - Added bin: B2 (Total bins: 2)
+23:07:24.161266500 - Bin B2 location: (36,0), Distance to Entry=50.91m, Distance to Exit=73.01m
+23:07:24.162266400 - Added bin: B3 (Total bins: 3)
+23:07:24.163266500 - Bin B3 location: (48,20), Distance to Entry=28.84m, Distance to Exit=49.98m
+23:07:24.169779100 - Stored Item{I001, type=Chair} in bin B1
+23:07:24.170788600 - Stored Item{I002, type=Table} in bin B2
+23:07:24.171792100 - Stored Item{I003, type=Sofa} in bin B3
+23:07:24.176790800 - Removed item from bin B1
+23:07:24.177791300 - Removed item from bin B2
+23:07:24.178792700 - Removed item from bin B3
+23:07:24.264321300 - stream data exchange: [Task1, Task2, Task3]
+23:28:56.725624 - Storage system initialized with max bins: 5
+23:28:56.751625900 - Added bin: B1 (Total bins: 1)
+23:28:56.788674200 - Bin B1 location: (94,42), Distance to Entry=50.09m, Distance to Exit=62.51m
+23:28:56.788674200 - Added bin: B2 (Total bins: 2)
+23:28:56.789672400 - Bin B2 location: (23,16), Distance to Entry=33.54m, Distance to Exit=20.12m
+23:28:56.790674200 - Added bin: B3 (Total bins: 3)
+23:28:56.791670800 - Bin B3 location: (18,59), Distance to Entry=16.40m, Distance to Exit=13.00m
+23:28:56.797670200 - Stored Item{I001, type=Chair} in bin B1
+23:28:56.798671 - Stored Item{I002, type=Table} in bin B2
+23:28:56.798671 - Stored Item{I003, type=Sofa} in bin B3
+23:28:56.801672600 - Removed item from bin B1
+23:28:56.802673900 - Removed item from bin B2
+23:28:56.803672400 - Removed item from bin B3
+23:28:56.881680600 - stream data exchange: [Task1, Task2, Task3]
