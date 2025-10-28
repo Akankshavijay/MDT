@@ -1,0 +1,3 @@
+00:07:18 | [BATTERY] M1 | Battery=26% | State=in-progress
+00:07:18 | [MOVER] M1 | STORE | Bin=B8 | Item=CA-9707 (Cabinet) | Dist=0.00m | Battery=26% | State=in-progress
+00:07:18 | [MOVER] M1 | RETRIEVE | Bin=B80 | Item=LA-5548 (Lamp) | Dist=0.00m | Battery=26% | State=in-progress

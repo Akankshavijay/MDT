@@ -1,0 +1,6 @@
+00:12:08 | Stream ← Received: RETRIEVE | Bin=B63 | Item=CA-5762 (Cabinet)
+00:12:08 | ⚠️ No available robots for task: RETRIEVE | Bin=B63 | Item=CA-5762 (Cabinet)
+00:12:10 | Stream ← Received: RETRIEVE | Bin=B82 | Item=BE-5686 (Bed)
+00:12:10 | ⚠️ No available robots for task: RETRIEVE | Bin=B82 | Item=BE-5686 (Bed)
+00:12:12 | Stream ← Received: STORE | Bin=B16 | Item=DE-3601 (Desk)
+00:12:12 | ⚠️ No available robots for task: STORE | Bin=B16 | Item=DE-3601 (Desk)

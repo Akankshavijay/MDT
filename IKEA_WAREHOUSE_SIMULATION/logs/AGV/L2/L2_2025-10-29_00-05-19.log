@@ -1,0 +1,3 @@
+00:05:19 | [BATTERY] L2 | Battery=34% | State=in-progress
+00:05:19 | [LOADER] L2 | RETRIEVE | Bin=B43 | Item=CH-8977 (Chair) | Dist=0.00m | Battery=34% | State=in-progress
+00:05:19 | [LOADER] L2 | RETRIEVE | Bin=B71 | Item=BE-6034 (Bed) | Dist=0.00m | Battery=34% | State=in-progress

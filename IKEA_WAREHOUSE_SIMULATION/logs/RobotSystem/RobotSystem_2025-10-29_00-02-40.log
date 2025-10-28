@@ -1,0 +1,4 @@
+00:02:40 | Stream ← Received: STORE | Bin=B6 | Item=SH-5011 (Shelf)
+00:02:40 | No available robots for: STORE | Bin=B6 | Item=SH-5011 (Shelf)
+00:02:42 | Stream ← Received: STORE | Bin=B45 | Item=DE-2263 (Desk)
+00:02:42 | No available robots for: STORE | Bin=B45 | Item=DE-2263 (Desk)

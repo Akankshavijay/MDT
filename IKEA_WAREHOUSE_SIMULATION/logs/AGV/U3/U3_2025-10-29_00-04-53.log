@@ -1,0 +1,4 @@
+00:04:53 | [BATTERY] U3 | Battery=65% | State=in-progress
+00:04:53 | [UNLOADER] U3 | STORE | Bin=B40 | Item=CA-2571 (Cabinet) | Dist=64.40m | Battery=65% | State=in-progress
+00:04:53 | [BATTERY] U3 | Battery=30% | State=in-progress
+00:04:53 | [UNLOADER] U3 | STORE | Bin=B64 | Item=DE-8649 (Desk) | Dist=0.00m | Battery=30% | State=in-progress

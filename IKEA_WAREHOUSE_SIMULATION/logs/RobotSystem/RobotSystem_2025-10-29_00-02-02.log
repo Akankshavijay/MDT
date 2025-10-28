@@ -1,0 +1,6 @@
+00:02:02 | Stream ← Received: STORE | Bin=B44 | Item=DE-6334 (Desk)
+00:02:02 | No available robots for: STORE | Bin=B44 | Item=DE-6334 (Desk)
+00:02:04 | Stream ← Received: RETRIEVE | Bin=B40 | Item=KE-655 (Keyboard)
+00:02:04 | No available robots for: RETRIEVE | Bin=B40 | Item=KE-655 (Keyboard)
+00:02:07 | Stream ← Received: STORE | Bin=B31 | Item=TA-7725 (Table)
+00:02:07 | No available robots for: STORE | Bin=B31 | Item=TA-7725 (Table)

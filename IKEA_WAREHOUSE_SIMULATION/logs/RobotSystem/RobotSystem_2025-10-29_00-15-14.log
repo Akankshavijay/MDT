@@ -1,0 +1,3 @@
+00:15:14 | Stream ← Received: STORE | Bin=B94 | Item=MO-5843 (Monitor)
+00:15:17 | Stream ← Received: STORE | Bin=B46 | Item=KE-4650 (Keyboard)
+00:15:19 | Stream ← Received: RETRIEVE | Bin=B47 | Item=RO-1467 (Router)

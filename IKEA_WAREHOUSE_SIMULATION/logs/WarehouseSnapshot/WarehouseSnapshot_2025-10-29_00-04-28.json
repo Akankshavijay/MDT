@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-10-29T00:04:28.690693500",
+  "warehouseMap": {
+    "entries": [
+      {"id": "EntryGate-B", "x": 58, "y": 34},
+      {"id": "EntryGate-C", "x": 99, "y": 50},
+      {"id": "EntryGate-A", "x": 30, "y": 53},
+      {"id": "EntryGate-D", "x": 41, "y": 5},
+      {"id": "EntryGate-E", "x": 92, "y": 53}
+    ],
+    "exits": [
+      {"id": "ExitGate-4", "x": 52, "y": 30},
+      {"id": "ExitGate-2", "x": 38, "y": 52},
+      {"id": "ExitGate-3", "x": 64, "y": 94},
+      {"id": "ExitGate-1", "x": 23, "y": 58}
+    ],
+    "chargingStations": [
+      {"id": "ChargeSlot-5", "x": 66, "y": 42},
+      {"id": "ChargeSlot-6", "x": 52, "y": 98},
+      {"id": "ChargeSlot-3", "x": 59, "y": 14},
+      {"id": "ChargeSlot-4", "x": 53, "y": 3},
+      {"id": "ChargeSlot-1", "x": 34, "y": 87},
+      {"id": "ChargeSlot-2", "x": 80, "y": 16}
+    ],
+    "bins": [
+
+    ]
+  },
+  "AGVs": [
+    {"id": "L1", "type": "loader", "state": "in-progress", "battery": 40},
+    {"id": "L2", "type": "loader", "state": "in-progress", "battery": 50},
+    {"id": "L3", "type": "loader", "state": "free", "battery": 51},
+    {"id": "L4", "type": "loader", "state": "free", "battery": 67},
+    {"id": "L5", "type": "loader", "state": "free", "battery": 60},
+    {"id": "L6", "type": "loader", "state": "free", "battery": 60},
+    {"id": "L7", "type": "loader", "state": "free", "battery": 85},
+    {"id": "L8", "type": "loader", "state": "free", "battery": 60},
+    {"id": "L9", "type": "loader", "state": "free", "battery": 60},
+    {"id": "L10", "type": "loader", "state": "free", "battery": 86},
+    {"id": "M1", "type": "mover", "state": "free", "battery": 32},
+    {"id": "M2", "type": "mover", "state": "free", "battery": 52},
+    {"id": "M3", "type": "mover", "state": "free", "battery": 68},
+    {"id": "M4", "type": "mover", "state": "free", "battery": 60},
+    {"id": "M5", "type": "mover", "state": "free", "battery": 60},
+    {"id": "M6", "type": "mover", "state": "free", "battery": 95},
+    {"id": "M7", "type": "mover", "state": "free", "battery": 60},
+    {"id": "M8", "type": "mover", "state": "free", "battery": 84},
+    {"id": "M9", "type": "mover", "state": "free", "battery": 86},
+    {"id": "M10", "type": "mover", "state": "free", "battery": 95},
+    {"id": "M11", "type": "mover", "state": "free", "battery": 100},
+    {"id": "M12", "type": "mover", "state": "free", "battery": 100},
+    {"id": "M13", "type": "mover", "state": "free", "battery": 100},
+    {"id": "M14", "type": "mover", "state": "free", "battery": 100},
+    {"id": "M15", "type": "mover", "state": "free", "battery": 100},
+    {"id": "U1", "type": "unloader", "state": "free", "battery": 42},
+    {"id": "U2", "type": "unloader", "state": "in-progress", "battery": 39},
+    {"id": "U3", "type": "unloader", "state": "in-progress", "battery": 39},
+    {"id": "U4", "type": "unloader", "state": "free", "battery": 42},
+    {"id": "U5", "type": "unloader", "state": "free", "battery": 54},
+    {"id": "U6", "type": "unloader", "state": "free", "battery": 60},
+    {"id": "U7", "type": "unloader", "state": "free", "battery": 60},
+    {"id": "U8", "type": "unloader", "state": "free", "battery": 57},
+    {"id": "U9", "type": "unloader", "state": "free", "battery": 60},
+    {"id": "U10", "type": "unloader", "state": "free", "battery": 61}
+  ]
+}

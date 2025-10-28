@@ -1,0 +1,5 @@
+00:04:58 | [BATTERY] M1 | Battery=65% | State=in-progress
+00:04:58 | [MOVER] M1 | RETRIEVE | Bin=B99 | Item=LA-5838 (Lamp) | Dist=0.00m | Battery=65% | State=in-progress
+00:04:58 | [BATTERY] M1 | Battery=22% | State=in-progress
+00:04:58 | [MOVER] M1 | RETRIEVE | Bin=B19 | Item=TA-7508 (Table) | Dist=0.00m | Battery=22% | State=in-progress
+00:04:58 | [MOVER] M1 | RETRIEVE | Bin=B30 | Item=KE-6296 (Keyboard) | Dist=0.00m | Battery=65% | State=in-progress

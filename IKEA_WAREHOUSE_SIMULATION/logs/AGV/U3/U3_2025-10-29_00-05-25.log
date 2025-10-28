@@ -1,0 +1,4 @@
+00:05:25 | [BATTERY] U3 | Battery=56% | State=in-progress
+00:05:25 | [UNLOADER] U3 | RETRIEVE | Bin=B19 | Item=BE-8815 (Bed) | Dist=0.00m | Battery=56% | State=in-progress
+00:05:25 | [BATTERY] U3 | Battery=24% | State=in-progress
+00:05:25 | [UNLOADER] U3 | STORE | Bin=B67 | Item=KE-3767 (Keyboard) | Dist=0.00m | Battery=24% | State=in-progress

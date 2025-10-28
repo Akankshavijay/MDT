@@ -1,0 +1,3 @@
+00:02:02 | STORE: Item{DE-6334, type=Desk} → B44
+00:02:04 | RETRIEVE from B40
+00:02:07 | STORE: Item{TA-7725, type=Table} → B31

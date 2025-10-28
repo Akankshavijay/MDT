@@ -1,0 +1,3 @@
+00:04:20 | [BATTERY] U1 | Battery=45% | State=in-progress
+00:04:20 | [UNLOADER] U1 | RETRIEVE | Bin=B25 | Item=SO-2686 (Sofa) | Dist=0.00m | Battery=45% | State=in-progress
+00:04:20 | [UNLOADER] U1 | STORE | Bin=B7 | Item=FA-1852 (Fan) | Dist=0.00m | Battery=45% | State=in-progress

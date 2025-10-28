@@ -1,0 +1,3 @@
+00:05:51 | [BATTERY] U2 | Battery=49% | State=in-progress
+00:05:51 | [UNLOADER] U2 | STORE | Bin=B44 | Item=TA-7605 (Table) | Dist=0.00m | Battery=49% | State=in-progress
+00:05:51 | [UNLOADER] U2 | RETRIEVE | Bin=B95 | Item=BE-3448 (Bed) | Dist=0.00m | Battery=49% | State=in-progress

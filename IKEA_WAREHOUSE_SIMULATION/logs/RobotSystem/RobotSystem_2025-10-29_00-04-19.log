@@ -1,0 +1,6 @@
+00:04:19 | Stream ← Received: STORE | Bin=B85 | Item=MO-6533 (Monitor)
+00:04:19 | No available robots for: STORE | Bin=B85 | Item=MO-6533 (Monitor)
+00:04:22 | Stream ← Received: STORE | Bin=B99 | Item=FA-3418 (Fan)
+00:04:22 | No available robots for: STORE | Bin=B99 | Item=FA-3418 (Fan)
+00:04:24 | Stream ← Received: RETRIEVE | Bin=B71 | Item=LA-4865 (Lamp)
+00:04:24 | No available robots for: RETRIEVE | Bin=B71 | Item=LA-4865 (Lamp)

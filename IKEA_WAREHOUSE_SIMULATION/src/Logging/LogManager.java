@@ -2,6 +2,7 @@ package Logging;
 
 import StorageManagement.Bin;
 import warehouse_map.WarehouseMap;
+import RobotManager.AGV;
 
 import java.io.*;
 import java.time.*;
@@ -14,7 +15,7 @@ public class LogManager {
     private final Map<String, BufferedWriter> writers = new HashMap<>();
     private final Map<String, Long> lastWrite = new HashMap<>();
     private final DateTimeFormatter fileFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-    private final long ROTATION_INTERVAL_MS = 5000; // rotate every 5 seconds
+    private final long ROTATION_INTERVAL_MS = 5000;
     private final Pattern jsonPattern = Pattern.compile(".*\\.json$");
 
     public LogManager() {
@@ -53,6 +54,22 @@ public class LogManager {
         }
     }
 
+    public synchronized void logAGV(String agvId, String message) {
+        try {
+            File dir = new File(baseDir, "AGV/" + agvId);
+            if (!dir.exists()) dir.mkdirs();
+            String timestamp = LocalDateTime.now().format(fileFormat);
+            File logFile = new File(dir, agvId + "_" + timestamp + ".log");
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, true))) {
+                String time = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                bw.write(time + " | " + message);
+                bw.newLine();
+            }
+        } catch (IOException e) {
+            System.out.println("AGV log failed: " + e.getMessage());
+        }
+    }
+
     public synchronized void saveAsJson(String subsystem, String jsonContent) {
         try {
             String timestamp = LocalDateTime.now().format(fileFormat);
@@ -68,7 +85,8 @@ public class LogManager {
         }
     }
 
-    public void saveWarehouseSnapshot(WarehouseMap map, String subsystem) {
+    // ✅ Updated version now accepts AGVs and saves full snapshot
+    public void saveWarehouseSnapshot(WarehouseMap map, String subsystem, List<AGV> agvs) {
         StringBuilder json = new StringBuilder("{\n");
         json.append("  \"timestamp\": \"").append(LocalDateTime.now()).append("\",\n");
         json.append("  \"warehouseMap\": {\n");
@@ -91,7 +109,19 @@ public class LogManager {
                 .append("},\n");
         }
         if (!map.getBins().isEmpty()) json.setLength(json.length() - 2);
-        json.append("\n    ]\n  }\n}");
+        json.append("\n    ]\n  },\n");
+
+        json.append("  \"AGVs\": [\n");
+        for (AGV agv : agvs) {
+            json.append("    {\"id\": \"").append(agv.getId())
+                .append("\", \"type\": \"").append(agv.getType())
+                .append("\", \"state\": \"").append(agv.getState())
+                .append("\", \"battery\": ").append(agv.getBatteryLevel())
+                .append("},\n");
+        }
+        if (!agvs.isEmpty()) json.setLength(json.length() - 2);
+        json.append("\n  ]\n}");
+
         saveAsJson(subsystem, json.toString());
     }
 

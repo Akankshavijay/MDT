@@ -1,0 +1,3 @@
+00:04:56 | [BATTERY] U2 | Battery=27% | State=in-progress
+00:04:56 | [UNLOADER] U2 | RETRIEVE | Bin=B60 | Item=DE-2664 (Desk) | Dist=0.00m | Battery=27% | State=in-progress
+00:04:56 | [UNLOADER] U2 | RETRIEVE | Bin=B19 | Item=TA-7508 (Table) | Dist=0.00m | Battery=27% | State=in-progress

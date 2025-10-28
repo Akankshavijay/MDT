@@ -1,0 +1,5 @@
+00:12:41 | Stream ← Received: STORE | Bin=B56 | Item=MO-8855 (Monitor)
+00:12:41 | ⚠️ No available robots for task: STORE | Bin=B56 | Item=MO-8855 (Monitor)
+00:12:42 | Stream ← Received: RETRIEVE | Bin=B13 | Item=CA-5728 (Carpet)
+00:12:42 | ⚠️ No available robots for task: RETRIEVE | Bin=B13 | Item=CA-5728 (Carpet)
+00:12:44 | Stream ← Received: STORE | Bin=B48 | Item=MO-4173 (Monitor)

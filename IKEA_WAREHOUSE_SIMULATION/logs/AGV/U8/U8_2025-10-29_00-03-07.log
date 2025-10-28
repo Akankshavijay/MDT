@@ -1,0 +1,3 @@
+00:03:07 | [BATTERY] U8 | Battery=60% | State=in-progress
+00:03:07 | [UNLOADER] U8 | STORE | Bin=B13 | Item=FA-6810 (Fan) | Dist=0.00m | Battery=60% | State=in-progress
+00:03:07 | [UNLOADER] U8 | RETRIEVE | Bin=B78 | Item=SH-9385 (Shelf) | Dist=0.00m | Battery=60% | State=in-progress

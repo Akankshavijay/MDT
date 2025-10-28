@@ -1,0 +1,4 @@
+00:05:52 | RETRIEVE from B70
+00:05:54 | STORE: Item{MO-7366, type=Monitor} → B83
+00:05:55 | STORE: Item{LA-5108, type=Lamp} → B80
+00:05:56 | STORE: Item{LA-9900, type=Lamp} → B61

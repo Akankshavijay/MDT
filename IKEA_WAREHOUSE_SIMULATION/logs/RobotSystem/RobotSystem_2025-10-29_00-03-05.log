@@ -1,0 +1,3 @@
+00:03:05 | Stream ← Received: STORE | Bin=B59 | Item=FA-9693 (Fan)
+00:03:05 | No available robots for: STORE | Bin=B59 | Item=FA-9693 (Fan)
+00:03:07 | Stream ← Received: RETRIEVE | Bin=B78 | Item=SH-9385 (Shelf)

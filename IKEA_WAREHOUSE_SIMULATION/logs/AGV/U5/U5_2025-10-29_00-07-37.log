@@ -1,0 +1,3 @@
+00:07:37 | [BATTERY] U5 | Battery=51% | State=in-progress
+00:07:37 | [UNLOADER] U5 | RETRIEVE | Bin=B36 | Item=RO-1535 (Router) | Dist=0.00m | Battery=51% | State=in-progress
+00:07:37 | [UNLOADER] U5 | RETRIEVE | Bin=B64 | Item=FA-1108 (Fan) | Dist=0.00m | Battery=51% | State=in-progress

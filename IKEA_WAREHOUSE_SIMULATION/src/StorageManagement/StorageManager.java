@@ -1,9 +1,12 @@
 package StorageManagement;
 
-import java.util.*;
-import warehouse_map.*;
+import Communication.WarehouseMessage;
 import Logging.LogManager;
 import Exception_Handler.WarehouseException;
+import warehouse_map.WarehouseMap;
+
+import java.io.*;
+import java.util.*;
 
 public class StorageManager {
     private final Map<String, Bin> bins = new HashMap<>();
@@ -12,6 +15,7 @@ public class StorageManager {
     private final String systemName;
     private final int maxBins;
     private final WarehouseMap warehouseMap;
+    private ObjectOutputStream outStream;
 
     public StorageManager(String systemName, LogManager logger, WarehouseException handler, WarehouseMap warehouseMap, int maxBins) {
         this.systemName = systemName;
@@ -22,49 +26,42 @@ public class StorageManager {
         logger.log(systemName, "Storage system initialized with max bins: " + maxBins);
     }
 
+    public void connectStream(ObjectOutputStream stream) {
+        this.outStream = stream;
+    }
+
     public void addBin(Bin bin) {
         handler.handleWarehouseOperation(systemName, () -> {
-            if (bins.size() >= maxBins) {
-                String msg = "Cannot add bin '" + bin.getId() + "' — warehouse at full capacity (" + maxBins + ")";
-                logger.log(systemName, msg);
-                throw new RuntimeException(msg);
-            }
-            if (bins.containsKey(bin.getId())) {
-                String msg = "Duplicate bin ID: " + bin.getId();
-                logger.log(systemName, msg);
-                throw new RuntimeException(msg);
-            }
+            if (bins.size() >= maxBins)
+                throw new RuntimeException("Cannot add more bins, limit reached.");
 
             List<int[]> entries = new ArrayList<>(warehouseMap.getEntryPoints().values());
             List<int[]> exits = new ArrayList<>(warehouseMap.getExitPoints().values());
             bin.computeDistances(entries, exits);
-
             bins.put(bin.getId(), bin);
-            warehouseMap.addBin(bin);
-
-            logger.log(systemName, "Added bin: " + bin.getId() + " (Total bins: " + bins.size() + ")");
-            logger.log(systemName, "Bin " + bin.getId() + " location: (" + bin.getX() + "," + bin.getY() + 
-                    "), Distance to Entry=" + String.format("%.2f", bin.getDistanceToEntry()) + 
-                    "m, Distance to Exit=" + String.format("%.2f", bin.getDistanceToExit()) + "m");
         });
     }
 
-    public void storeItem(String binId, Item item) {
-        handler.handleWarehouseOperation(systemName, () -> {
-            Bin bin = bins.get(binId);
-            if (bin == null) throw new RuntimeException("Bin not found: " + binId);
-            bin.setItem(item);
-            logger.log(systemName, "Stored " + item + " in bin " + binId);
-        });
+    public void requestStore(String binId, Item item) {
+        try {
+            WarehouseMessage msg = new WarehouseMessage("store", binId, item.getId(), item.getType());
+            outStream.writeObject(msg);
+            outStream.flush();
+            logger.log(systemName, "Stream → Sent STORE request: " + msg);
+        } catch (IOException e) {
+            handler.handleWarehouseOperation(systemName, () -> { throw new RuntimeException(e); });
+        }
     }
 
-    public void removeItem(String binId) {
-        handler.handleWarehouseOperation(systemName, () -> {
-            Bin bin = bins.get(binId);
-            if (bin == null) throw new RuntimeException("Bin not found: " + binId);
-            bin.setItem(null);
-            logger.log(systemName, "Removed item from bin " + binId);
-        });
+    public void requestRetrieve(String binId, Item item) {
+        try {
+            WarehouseMessage msg = new WarehouseMessage("retrieve", binId, item.getId(), item.getType());
+            outStream.writeObject(msg);
+            outStream.flush();
+            logger.log(systemName, "Stream → Sent RETRIEVE request: " + msg);
+        } catch (IOException e) {
+            handler.handleWarehouseOperation(systemName, () -> { throw new RuntimeException(e); });
+        }
     }
 
     public boolean isBinOccupied(String binId) {
@@ -76,8 +73,4 @@ public class StorageManager {
         Bin bin = bins.get(binId);
         return bin != null ? bin.getItem() : Optional.empty();
     }
-
-    public int getTotalBins() { return bins.size(); }
-    public int getMaxBins() { return maxBins; }
-    public WarehouseMap getWarehouseMap() { return warehouseMap; }
 }

@@ -1,0 +1,3 @@
+00:13:00 | [BATTERY] U1 | Battery=70% | State=in-progress
+00:13:00 | [UNLOADER] U1 | RETRIEVE | Bin=B7 | Item=FA-6750 (Fan) | Dist=0.00m | Battery=70% | State=in-progress
+00:13:00 | [UNLOADER] U1 | RETRIEVE | Bin=B19 | Item=CA-2981 (Cabinet) | Dist=0.00m | Battery=70% | State=in-progress

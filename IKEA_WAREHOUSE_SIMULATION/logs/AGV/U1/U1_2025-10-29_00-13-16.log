@@ -1,0 +1,3 @@
+00:13:16 | [BATTERY] U1 | Battery=64% | State=in-progress
+00:13:16 | [UNLOADER] U1 | STORE | Bin=B46 | Item=MO-3150 (Monitor) | Dist=0.00m | Battery=64% | State=in-progress
+00:13:16 | [UNLOADER] U1 | STORE | Bin=B14 | Item=LA-5780 (Lamp) | Dist=0.00m | Battery=64% | State=in-progress

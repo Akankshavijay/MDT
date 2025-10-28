@@ -1,0 +1,4 @@
+00:25:00 | Stream ← Received: RETRIEVE | Bin=B100 | Item=BO-2385 (Box)
+00:25:00 | ⚠️ No available robots for task: RETRIEVE | Bin=B100 | Item=BO-2385 (Box)
+00:25:03 | Stream ← Received: STORE | Bin=B45 | Item=LA-6258 (Lamp)
+00:25:03 | ⚠️ No available robots for task: STORE | Bin=B45 | Item=LA-6258 (Lamp)

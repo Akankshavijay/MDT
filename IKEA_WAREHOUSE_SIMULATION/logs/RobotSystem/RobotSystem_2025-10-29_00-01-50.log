@@ -1,0 +1,6 @@
+00:01:50 | Stream ← Received: RETRIEVE | Bin=B87 | Item=CA-7099 (Cabinet)
+00:01:50 | No available robots for: RETRIEVE | Bin=B87 | Item=CA-7099 (Cabinet)
+00:01:51 | Stream ← Received: STORE | Bin=B87 | Item=SO-9106 (Sofa)
+00:01:51 | No available robots for: STORE | Bin=B87 | Item=SO-9106 (Sofa)
+00:01:53 | Stream ← Received: RETRIEVE | Bin=B42 | Item=BE-7990 (Bed)
+00:01:53 | No available robots for: RETRIEVE | Bin=B42 | Item=BE-7990 (Bed)

@@ -1,0 +1,4 @@
+00:05:30 | [BATTERY] U1 | Battery=51% | State=in-progress
+00:05:30 | [UNLOADER] U1 | STORE | Bin=B39 | Item=KE-9004 (Keyboard) | Dist=0.00m | Battery=51% | State=in-progress
+00:05:30 | [BATTERY] U1 | Battery=18% | State=in-progress
+00:05:30 | [UNLOADER] U1 | STORE | Bin=B84 | Item=DE-1434 (Desk) | Dist=0.00m | Battery=18% | State=in-progress
