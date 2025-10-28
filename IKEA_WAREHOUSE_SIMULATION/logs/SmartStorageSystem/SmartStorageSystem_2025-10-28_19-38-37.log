@@ -1,0 +1,15 @@
+19:38:37 | Storage system initialized with max bins: 5
+19:38:37 | Added bin: B1 (Total bins: 1)
+19:38:37 | Bin B1 location: (78,52), Distance to Entry=19.42m, Distance to Exit=47.76m
+19:38:37 | Added bin: B2 (Total bins: 2)
+19:38:37 | Bin B2 location: (12,4), Distance to Entry=68.45m, Distance to Exit=101.08m
+19:38:37 | Added bin: B3 (Total bins: 3)
+19:38:37 | Bin B3 location: (57,10), Distance to Entry=28.60m, Distance to Exit=85.01m
+19:38:37 | Stored Item{I001, type=Chair} in bin B1
+19:38:37 | Stored Item{I002, type=Table} in bin B2
+19:38:37 | Stored Item{I003, type=Sofa} in bin B3
+19:38:37 | Removed item from bin B1
+19:38:37 | Removed item from bin B2
+19:38:37 | Removed item from bin B3
+19:38:37 | stream data exchange: [Task1, Task2, Task3]
+19:38:37 | Test log entry 1
