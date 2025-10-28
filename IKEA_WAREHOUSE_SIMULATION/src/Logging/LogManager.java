@@ -1,19 +1,21 @@
 package Logging;
 
+import StorageManagement.Bin;
+import warehouse_map.WarehouseMap;
+
 import java.io.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.regex.*;
+import java.util.regex.Pattern;
 
 public class LogManager {
     private final File baseDir = new File("logs");
     private final Map<String, BufferedWriter> writers = new HashMap<>();
-    private final DateTimeFormatter fileFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-    private final Pattern timePattern = Pattern.compile("(\\d{2})-(\\d{2})-(\\d{2})\\.log$"); // match timestamp suffix
-    private final long ROTATION_INTERVAL_MS = 5000; // 5 seconds
-
     private final Map<String, Long> lastWrite = new HashMap<>();
+    private final DateTimeFormatter fileFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+    private final long ROTATION_INTERVAL_MS = 5000; // rotate every 5 seconds
+    private final Pattern jsonPattern = Pattern.compile(".*\\.json$");
 
     public LogManager() {
         if (!baseDir.exists()) baseDir.mkdirs();
@@ -24,18 +26,18 @@ public class LogManager {
         Long last = lastWrite.getOrDefault(subsystem, 0L);
         BufferedWriter writer = writers.get(subsystem);
 
-        // Rotate file if more than 5s passed
         if (writer == null || (now - last) > ROTATION_INTERVAL_MS) {
             if (writer != null) writer.close();
+
             String timestamp = LocalDateTime.now().format(fileFormat);
             File dir = new File(baseDir, subsystem);
             if (!dir.exists()) dir.mkdirs();
             File logFile = new File(dir, subsystem + "_" + timestamp + ".log");
             writer = new BufferedWriter(new FileWriter(logFile, true));
+
             writers.put(subsystem, writer);
             lastWrite.put(subsystem, now);
         }
-
         return writer;
     }
 
@@ -51,32 +53,67 @@ public class LogManager {
         }
     }
 
+    public synchronized void saveAsJson(String subsystem, String jsonContent) {
+        try {
+            String timestamp = LocalDateTime.now().format(fileFormat);
+            File dir = new File(baseDir, subsystem);
+            if (!dir.exists()) dir.mkdirs();
+
+            File jsonFile = new File(dir, subsystem + "_" + timestamp + ".json");
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(jsonFile))) {
+                bw.write(jsonContent);
+            }
+        } catch (IOException e) {
+            System.out.println("JSON save failed for " + subsystem + ": " + e.getMessage());
+        }
+    }
+
+    public void saveWarehouseSnapshot(WarehouseMap map, String subsystem) {
+        StringBuilder json = new StringBuilder("{\n");
+        json.append("  \"timestamp\": \"").append(LocalDateTime.now()).append("\",\n");
+        json.append("  \"warehouseMap\": {\n");
+
+        json.append("    \"entries\": [\n");
+        appendMap(json, map.getEntryPoints());
+        json.append("    ],\n    \"exits\": [\n");
+        appendMap(json, map.getExitPoints());
+        json.append("    ],\n    \"chargingStations\": [\n");
+        appendMap(json, map.getChargingStations());
+        json.append("    ],\n    \"bins\": [\n");
+
+        for (Bin b : map.getBins().values()) {
+            json.append("      {\"id\": \"").append(b.getId())
+                .append("\", \"x\": ").append(b.getX())
+                .append(", \"y\": ").append(b.getY())
+                .append(", \"occupied\": ").append(b.isOccupied())
+                .append(", \"distanceToEntry\": ").append(String.format("%.2f", b.getDistanceToEntry()))
+                .append(", \"distanceToExit\": ").append(String.format("%.2f", b.getDistanceToExit()))
+                .append("},\n");
+        }
+        if (!map.getBins().isEmpty()) json.setLength(json.length() - 2);
+        json.append("\n    ]\n  }\n}");
+        saveAsJson(subsystem, json.toString());
+    }
+
+    private void appendMap(StringBuilder sb, Map<String, int[]> map) {
+        for (var e : map.entrySet()) {
+            sb.append("      {\"id\": \"").append(e.getKey())
+              .append("\", \"x\": ").append(e.getValue()[0])
+              .append(", \"y\": ").append(e.getValue()[1])
+              .append("},\n");
+        }
+        if (!map.isEmpty()) sb.setLength(sb.length() - 2);
+        sb.append("\n");
+    }
+
     public List<String> listLogs(String subsystem) {
         File dir = new File(baseDir, subsystem);
         if (!dir.exists()) return List.of();
-        return Arrays.asList(Objects.requireNonNull(dir.list((d, name) -> name.endsWith(".log"))));
-    }
-
-    public String openLog(String subsystem, String regexFilter) {
-        File dir = new File(baseDir, subsystem);
-        if (!dir.exists()) return "No logs";
-        Pattern regex = Pattern.compile(regexFilter);
-        StringBuilder sb = new StringBuilder();
-        for (File file : Objects.requireNonNull(dir.listFiles())) {
-            if (regex.matcher(file.getName()).find()) {
-                try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                    sb.append("=== ").append(file.getName()).append(" ===\n");
-                    String line;
-                    while ((line = br.readLine()) != null) sb.append(line).append("\n");
-                } catch (IOException e) {
-                    sb.append("Error reading ").append(file.getName()).append("\n");
-                }
-            }
-        }
-        return sb.toString();
+        return Arrays.asList(Objects.requireNonNull(dir.list((d, name) -> name.endsWith(".log") || jsonPattern.matcher(name).find())));
     }
 
     public Set<String> listSubsystems() {
-        return new HashSet<>(Arrays.asList(Objects.requireNonNull(baseDir.list())));
+        String[] dirs = baseDir.list();
+        return dirs == null ? Set.of() : new HashSet<>(Arrays.asList(dirs));
     }
 }
