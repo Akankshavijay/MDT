@@ -1,0 +1,18 @@
+@startuml
+title AGV State Diagram – Logging Integration
+
+[*] --> FREE
+FREE : Ready for assignment
+
+FREE --> IN_PROGRESS : receiveTask()
+IN_PROGRESS : logs "Start Task"
+IN_PROGRESS --> FREE : taskComplete()
+IN_PROGRESS --> CHARGING : battery<20%
+IN_PROGRESS --> ERROR : faultDetected()
+
+CHARGING : logs "Added to Charging Queue"
+CHARGING --> FREE : chargeComplete()
+ERROR : logs "Error <details>"
+ERROR --> FREE : reset()
+
+@enduml

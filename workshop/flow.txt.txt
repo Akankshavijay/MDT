@@ -1,0 +1,26 @@
+@startuml
+title Smart Warehouse – Logging and Status Update Sequence
+
+actor "User / UI" as User
+participant "TaskManager" as TM
+participant "RobotManager" as RM
+participant "AGV (R1)" as AGV
+participant "LogManager" as LM
+
+User -> TM : createTask("LOAD_TO_BIN", "B1")
+TM -> LM : log("TaskManager", "Created task T1 for bin B1")
+TM -> RM : sendTask(T1)
+RM -> LM : log("RobotManager", "Assign task T1 -> AGV R1")
+
+RM -> AGV : perform(T1)
+AGV -> LM : log("Robot-R1", "Start T1 | battery=95%")
+AGV -> LM : log("Robot-R1", "Moving to EntryGate-A (3s)")
+AGV -> LM : log("Robot-R1", "Loading item... (5s)")
+AGV -> LM : log("Robot-R1", "Delivering to bin B1 (8s)")
+AGV -> LM : log("Robot-R1", "Done task T1 | battery=90%")
+
+AGV -> RM : taskCompleted("T1")
+RM -> TM : updateTaskStatus("T1", "Completed")
+TM -> LM : log("TaskManager", "Task T1 marked Completed")
+
+@enduml

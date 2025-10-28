@@ -1,0 +1,119 @@
+@startuml
+title Smart Warehouse Capstone Project – Class Diagram (with Logging)
+
+package "Logging Framework" {
+  class LogManager {
+    +log(subsystem: String, message: String)
+    +openLog(subsystem: String, date: String): String
+    +listLogs(subsystem: String): List<String>
+  }
+}
+
+package "Task Management" {
+  class TaskManager {
+    -tasks: List<Task>
+    -logger: LogManager
+    +createTask(type: TaskType, binId: String)
+    +updateTaskStatus(taskId: String, status: String)
+  }
+
+  class Task {
+    +id: String
+    +type: TaskType
+    +status: String
+    +binId: String
+  }
+
+  enum TaskType {
+    LOAD_TO_BIN
+    UNLOAD_TO_EXIT
+    MOVE_ONLY
+  }
+}
+
+package "Robot System" {
+  class AGV {
+    -id: String
+    -type: AGVType
+    -battery: int
+    -state: RobotState
+    -x: int
+    -y: int
+    +perform(task: RobotTask, map: WarehouseMap, logger: LogManager)
+  }
+
+  class RobotManager {
+    -robots: Map<String, AGV>
+    -chargingQueue: List<String>
+    -logger: LogManager
+    +addRobot(robot: AGV)
+    +receiveTasks(input: InputStream)
+    +getChargingQueue(): List<String>
+  }
+
+  class RobotTask {
+    +id: String
+    +type: TaskType
+    +binId: String
+  }
+
+  enum AGVType {
+    MOVER
+    LOADER
+    UNLOADER
+  }
+
+  enum RobotState {
+    FREE
+    IN_PROGRESS
+    CHARGING
+    ERROR
+  }
+}
+
+package "Storage System" {
+  class StorageManager {
+    -bins: Map<String, Bin>
+    -logger: LogManager
+    +storeItem(binId: String, item: Item)
+    +removeItem(binId: String)
+  }
+
+  class Bin {
+    +id: String
+    +x: int
+    +y: int
+    +isOccupied: boolean
+  }
+
+  class Item {
+    +id: String
+    +type: String
+  }
+}
+
+package "Common" {
+  class WarehouseMap {
+    -entryPoints: Map<String, int[]>
+    -exitPoints: Map<String, int[]>
+    -chargingStations: Map<String, int[]>
+    -binMap: Map<String, Bin>
+    +printMap()
+  }
+}
+
+' --- Relationships ---
+LogManager --> TaskManager : logs task creation
+LogManager --> RobotManager : logs task assignment
+LogManager --> AGV : logs robot state updates
+
+TaskManager --> LogManager : uses
+TaskManager --> Task
+RobotManager --> AGV : manages
+AGV --> LogManager : uses
+AGV --> RobotTask
+StorageManager --> LogManager : uses
+StorageManager --> Bin
+WarehouseMap --> Bin
+
+@enduml
