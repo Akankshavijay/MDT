@@ -1,26 +1,27 @@
 @startuml
-title Smart Warehouse – Logging and Status Update Sequence
+title Data Flow Diagram – Smart Warehouse with AGV and Logging
 
-actor "User / UI" as User
-participant "TaskManager" as TM
-participant "RobotManager" as RM
-participant "AGV (R1)" as AGV
-participant "LogManager" as LM
+rectangle "User / Scheduler" as US
+rectangle "StorageManager" as SM
+rectangle "WarehouseMap" as WM
+rectangle "RobotManager" as RM
+rectangle "AGV Fleet" as AGV
+rectangle "LogManager" as LM
+database "File System (logs/<component>/)" as FS
 
-User -> TM : createTask("LOAD_TO_BIN", "B1")
-TM -> LM : log("TaskManager", "Created task T1 for bin B1")
-TM -> RM : sendTask(T1)
-RM -> LM : log("RobotManager", "Assign task T1 -> AGV R1")
+US --> SM : Add / Remove Items
+SM --> WM : Query Bin Layout
+SM --> LM : log(Storage Events)
+WM --> LM : saveWarehouseSnapshot()
+RM --> AGV : Assign Task
+AGV --> LM : log + saveAsJson(AGV State)
+RM --> LM : log(Task Assignment)
+LM --> FS : Write .log and .json per component
 
-RM -> AGV : perform(T1)
-AGV -> LM : log("Robot-R1", "Start T1 | battery=95%")
-AGV -> LM : log("Robot-R1", "Moving to EntryGate-A (3s)")
-AGV -> LM : log("Robot-R1", "Loading item... (5s)")
-AGV -> LM : log("Robot-R1", "Delivering to bin B1 (8s)")
-AGV -> LM : log("Robot-R1", "Done task T1 | battery=90%")
-
-AGV -> RM : taskCompleted("T1")
-RM -> TM : updateTaskStatus("T1", "Completed")
-TM -> LM : log("TaskManager", "Task T1 marked Completed")
+note right of FS
+  logs/WarehouseMap/...
+  logs/StorageSystem/...
+  logs/RobotSystem/...
+end note
 
 @enduml

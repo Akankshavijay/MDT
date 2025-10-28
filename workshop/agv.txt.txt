@@ -1,18 +1,33 @@
 @startuml
-title AGV State Diagram – Logging Integration
+title Sequence Diagram – Unified Logging Flow (Storage + AGV + Warehouse)
 
-[*] --> FREE
-FREE : Ready for assignment
+actor "User / Scheduler" as U
+participant "StorageManager" as SM
+participant "WarehouseMap" as WM
+participant "RobotManager" as RM
+participant "AGV (R1)" as AGV
+participant "LogManager" as LM
+participant "File System" as FS
 
-FREE --> IN_PROGRESS : receiveTask()
-IN_PROGRESS : logs "Start Task"
-IN_PROGRESS --> FREE : taskComplete()
-IN_PROGRESS --> CHARGING : battery<20%
-IN_PROGRESS --> ERROR : faultDetected()
+U -> SM : addBin(B1)
+SM -> LM : log("StorageSystem", "Added bin B1")
+SM -> WM : computeDistances(entry, exit)
+WM -> LM : saveWarehouseSnapshot(WM, "StorageSystem")
 
-CHARGING : logs "Added to Charging Queue"
-CHARGING --> FREE : chargeComplete()
-ERROR : logs "Error <details>"
-ERROR --> FREE : reset()
+U -> RM : assignTask(T1)
+RM -> AGV : perform(T1)
+AGV -> LM : log("RobotSystem", "AGV R1 started task T1")
+AGV -> LM : saveAsJson("RobotSystem", currentStateJSON)
+AGV -> LM : log("RobotSystem", "AGV R1 completed task T1")
+
+LM -> FS : write logs/StorageSystem/*.log
+LM -> FS : write logs/StorageSystem/*.json
+LM -> FS : write logs/RobotSystem/*.log
+LM -> FS : write logs/RobotSystem/*.json
+
+note right of FS
+  - Rotation: every 5s
+  - JSON contains AGV state and warehouse layout
+end note
 
 @enduml

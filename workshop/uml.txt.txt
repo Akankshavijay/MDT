@@ -1,66 +1,80 @@
 @startuml
-title Smart Warehouse Capstone Project – Class Diagram (with Logging)
+title Smart Warehouse Capstone Project – Full System UML (Logging, Storage, AGV)
 
-package "Logging Framework" {
+package "Logging" {
   class LogManager {
-    +log(subsystem: String, message: String)
-    +openLog(subsystem: String, date: String): String
-    +listLogs(subsystem: String): List<String>
+    - baseDir: File
+    - writers: Map<String, BufferedWriter>
+    - lastWrite: Map<String, Long>
+    - ROTATION_INTERVAL_MS: long
+    + log(subsystem: String, message: String)
+    + saveAsJson(subsystem: String, jsonContent: String)
+    + saveWarehouseSnapshot(map: WarehouseMap, subsystem: String)
+    + saveAGVSnapshot(manager: RobotManager, subsystem: String)
+    + listLogs(subsystem: String): List<String>
+    + listSubsystems(): Set<String>
   }
 }
 
-package "Task Management" {
-  class TaskManager {
-    -tasks: List<Task>
-    -logger: LogManager
-    +createTask(type: TaskType, binId: String)
-    +updateTaskStatus(taskId: String, status: String)
+package "Warehouse Map" {
+  class WarehouseMap {
+    - binMap: Map<String, Bin>
+    - entryPoints: Map<String, int[]>
+    - exitPoints: Map<String, int[]>
+    - chargingStations: Map<String, int[]>
+    + addBin(bin: Bin)
+    + getBins(): Map<String, Bin>
+    + getEntryPoints(): Map<String, int[]>
+    + getExitPoints(): Map<String, int[]>
+    + getChargingStations(): Map<String, int[]>
+    + printMap()
+  }
+}
+
+package "Storage Management" {
+  class Bin {
+    - id: String
+    - occupied: boolean
+    - item: Item
+    - x: int
+    - y: int
+    - distanceToEntry: double
+    - distanceToExit: double
+    + computeDistances(entryCoords: List<int[]>, exitCoords: List<int[]>)
   }
 
-  class Task {
-    +id: String
-    +type: TaskType
-    +status: String
-    +binId: String
+  class Item {
+    - id: String
+    - type: String
   }
 
-  enum TaskType {
-    LOAD_TO_BIN
-    UNLOAD_TO_EXIT
-    MOVE_ONLY
+  class StorageManager {
+    - bins: Map<String, Bin>
+    - logger: LogManager
+    + addBin(bin: Bin)
+    + storeItem(binId: String, item: Item)
+    + removeItem(binId: String)
+    + logSystemState()
   }
 }
 
 package "Robot System" {
   class AGV {
-    -id: String
-    -type: AGVType
-    -battery: int
-    -state: RobotState
-    -x: int
-    -y: int
-    +perform(task: RobotTask, map: WarehouseMap, logger: LogManager)
-  }
-
-  class RobotManager {
-    -robots: Map<String, AGV>
-    -chargingQueue: List<String>
-    -logger: LogManager
-    +addRobot(robot: AGV)
-    +receiveTasks(input: InputStream)
-    +getChargingQueue(): List<String>
-  }
-
-  class RobotTask {
-    +id: String
-    +type: TaskType
-    +binId: String
+    - id: String
+    - type: AGVType
+    - battery: int
+    - x: int
+    - y: int
+    - state: RobotState
+    + perform(task: RobotTask)
+    + moveTo(x: int, y: int)
+    + logState()
   }
 
   enum AGVType {
-    MOVER
     LOADER
     UNLOADER
+    MOVER
   }
 
   enum RobotState {
@@ -69,51 +83,33 @@ package "Robot System" {
     CHARGING
     ERROR
   }
-}
 
-package "Storage System" {
-  class StorageManager {
-    -bins: Map<String, Bin>
-    -logger: LogManager
-    +storeItem(binId: String, item: Item)
-    +removeItem(binId: String)
+  class RobotTask {
+    - id: String
+    - type: String
+    - binId: String
   }
 
-  class Bin {
-    +id: String
-    +x: int
-    +y: int
-    +isOccupied: boolean
-  }
-
-  class Item {
-    +id: String
-    +type: String
-  }
-}
-
-package "Common" {
-  class WarehouseMap {
-    -entryPoints: Map<String, int[]>
-    -exitPoints: Map<String, int[]>
-    -chargingStations: Map<String, int[]>
-    -binMap: Map<String, Bin>
-    +printMap()
+  class RobotManager {
+    - robots: Map<String, AGV>
+    - logger: LogManager
+    + addRobot(robot: AGV)
+    + assignTask(task: RobotTask)
+    + getAllRobots(): Collection<AGV>
   }
 }
 
 ' --- Relationships ---
-LogManager --> TaskManager : logs task creation
-LogManager --> RobotManager : logs task assignment
-LogManager --> AGV : logs robot state updates
-
-TaskManager --> LogManager : uses
-TaskManager --> Task
-RobotManager --> AGV : manages
-AGV --> LogManager : uses
-AGV --> RobotTask
 StorageManager --> LogManager : uses
-StorageManager --> Bin
-WarehouseMap --> Bin
+WarehouseMap --> Bin : contains
+Bin --> Item : holds
+WarehouseMap --> LogManager : calls saveWarehouseSnapshot()
+StorageManager --> WarehouseMap : references
+RobotManager --> LogManager : uses for log() and JSON
+RobotManager --> AGV : manages
+AGV --> LogManager : logs state
+AGV --> RobotTask : executes
+LogManager --> "logs/<subsystem>/*.json" : saves JSON
+LogManager --> "logs/<subsystem>/*.log" : saves text logs
 
 @enduml
