@@ -1,3 +1,0 @@
-00:04:25 | [BATTERY] L2 | Battery=50% | State=in-progress
-00:04:25 | [LOADER] L2 | STORE | Bin=B7 | Item=FA-1852 (Fan) | Dist=0.00m | Battery=50% | State=in-progress
-00:04:25 | [LOADER] L2 | RETRIEVE | Bin=B75 | Item=CH-951 (Chair) | Dist=0.00m | Battery=50% | State=in-progress

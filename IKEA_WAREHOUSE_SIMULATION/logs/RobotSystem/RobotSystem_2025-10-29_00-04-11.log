@@ -1,6 +1,0 @@
-00:04:11 | Stream ← Received: RETRIEVE | Bin=B20 | Item=RO-5675 (Router)
-00:04:11 | No available robots for: RETRIEVE | Bin=B20 | Item=RO-5675 (Router)
-00:04:14 | Stream ← Received: STORE | Bin=B62 | Item=RO-2090 (Router)
-00:04:14 | No available robots for: STORE | Bin=B62 | Item=RO-2090 (Router)
-00:04:16 | Stream ← Received: STORE | Bin=B3 | Item=SH-2747 (Shelf)
-00:04:16 | No available robots for: STORE | Bin=B3 | Item=SH-2747 (Shelf)

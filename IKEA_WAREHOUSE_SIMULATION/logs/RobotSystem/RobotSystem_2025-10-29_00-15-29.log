@@ -1,4 +1,0 @@
-00:15:29 | Stream ← Received: STORE | Bin=B66 | Item=LA-564 (Lamp)
-00:15:30 | ⚠️ AGV U3 (unloader) low battery: 19%. → Sent to discharge queue.
-00:15:30 | Stream ← Received: RETRIEVE | Bin=B44 | Item=TA-2996 (Table)
-00:15:34 | ⚠️ AGV U2 (unloader) low battery: 18%. → Sent to discharge queue.

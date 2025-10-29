@@ -1,3 +1,0 @@
-00:03:41 | [BATTERY] M1 | Battery=46% | State=in-progress
-00:03:41 | [MOVER] M1 | STORE | Bin=B12 | Item=BE-1342 (Bed) | Dist=0.00m | Battery=46% | State=in-progress
-00:03:41 | [MOVER] M1 | RETRIEVE | Bin=B49 | Item=MO-9581 (Monitor) | Dist=0.00m | Battery=46% | State=in-progress

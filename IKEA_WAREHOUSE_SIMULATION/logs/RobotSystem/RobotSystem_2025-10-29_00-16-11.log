@@ -1,4 +1,0 @@
-00:16:11 | Stream ← Received: STORE | Bin=B48 | Item=BO-3535 (Box)
-00:16:13 | Stream ← Received: RETRIEVE | Bin=B55 | Item=KE-5003 (Keyboard)
-00:16:13 | ⚠️ AGV M1 (mover) low battery: 20%. → Sent to discharge queue.
-00:16:15 | Stream ← Received: RETRIEVE | Bin=B66 | Item=TA-4269 (Table)

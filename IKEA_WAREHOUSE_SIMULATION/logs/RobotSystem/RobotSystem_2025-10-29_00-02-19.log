@@ -1,6 +1,0 @@
-00:02:19 | Stream ← Received: STORE | Bin=B51 | Item=SH-4112 (Shelf)
-00:02:19 | No available robots for: STORE | Bin=B51 | Item=SH-4112 (Shelf)
-00:02:21 | Stream ← Received: STORE | Bin=B28 | Item=CA-4630 (Cabinet)
-00:02:21 | No available robots for: STORE | Bin=B28 | Item=CA-4630 (Cabinet)
-00:02:23 | Stream ← Received: STORE | Bin=B26 | Item=FA-3857 (Fan)
-00:02:23 | No available robots for: STORE | Bin=B26 | Item=FA-3857 (Fan)

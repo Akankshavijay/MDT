@@ -1,3 +1,0 @@
-00:16:30 | Stream ← Received: RETRIEVE | Bin=B32 | Item=CA-4320 (Carpet)
-00:16:33 | ⚠️ AGV L3 (loader) low battery: 20%. → Sent to discharge queue.
-00:16:33 | Stream ← Received: RETRIEVE | Bin=B35 | Item=BE-3356 (Bed)

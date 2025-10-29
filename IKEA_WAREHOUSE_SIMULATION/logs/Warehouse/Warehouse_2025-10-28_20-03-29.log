@@ -1,8 +1,0 @@
-20:03:29 | Storage system initialized with max bins: 3
-20:03:29 | Added bin: X1 (Total bins: 1)
-20:03:29 | Bin X1 location: (78,68), Distance to Entry=13.89m, Distance to Exit=67.90m
-20:03:29 | Added bin: X2 (Total bins: 2)
-20:03:29 | Bin X2 location: (65,31), Distance to Entry=49.37m, Distance to Exit=59.93m
-20:03:29 | Added bin: X3 (Total bins: 3)
-20:03:29 | Bin X3 location: (88,71), Distance to Entry=19.24m, Distance to Exit=78.26m
-20:03:29 | Cannot add bin 'X4' — warehouse at full capacity (3)

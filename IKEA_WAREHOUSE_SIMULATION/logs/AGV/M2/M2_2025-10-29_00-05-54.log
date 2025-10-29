@@ -1,4 +1,0 @@
-00:05:54 | [BATTERY] M2 | Battery=36% | State=in-progress
-00:05:54 | [MOVER] M2 | RETRIEVE | Bin=B70 | Item=TA-3790 (Table) | Dist=0.00m | Battery=36% | State=in-progress
-00:05:54 | [BATTERY] M2 | Battery=68% | State=in-progress
-00:05:54 | [MOVER] M2 | RETRIEVE | Bin=B71 | Item=BO-5663 (Box) | Dist=0.00m | Battery=68% | State=in-progress

@@ -1,3 +1,0 @@
-00:06:10 | Stream → Sent STORE request: STORE | Bin=B8 | Item=DE-4099 (Desk)
-00:06:13 | Stream → Sent STORE request: STORE | Bin=B63 | Item=MO-8295 (Monitor)
-00:06:14 | Stream → Sent RETRIEVE request: RETRIEVE | Bin=B58 | Item=CA-5121 (Cabinet)

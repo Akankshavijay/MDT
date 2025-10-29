@@ -1,3 +1,0 @@
-00:15:56 | [BATTERY] M1 | Battery=25% | State=in-progress
-00:15:56 | [MOVER] M1 | STORE | Bin=B88 | Item=CA-8215 (Carpet) | Dist=0.00m | Battery=25% | State=in-progress
-00:15:56 | [MOVER] M1 | RETRIEVE | Bin=B35 | Item=MO-5840 (Monitor) | Dist=0.00m | Battery=25% | State=in-progress

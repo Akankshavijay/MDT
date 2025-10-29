@@ -1,4 +1,0 @@
-00:15:34 | ⚠️ AGV L1 (loader) low battery: 19%. → Sent to discharge queue.
-00:15:34 | Stream ← Received: RETRIEVE | Bin=B93 | Item=RO-3286 (Router)
-00:15:35 | Stream ← Received: RETRIEVE | Bin=B3 | Item=RO-6516 (Router)
-00:15:38 | Stream ← Received: RETRIEVE | Bin=B82 | Item=MO-5528 (Monitor)

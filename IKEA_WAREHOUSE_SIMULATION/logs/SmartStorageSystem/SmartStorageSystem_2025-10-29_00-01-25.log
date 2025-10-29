@@ -1,4 +1,0 @@
-00:01:25 | Storage system initialized with max bins: 100
-00:01:25 | Stream → Sent STORE request: STORE | Bin=B68 | Item=SO-8687 (Sofa)
-00:01:26 | Stream → Sent STORE request: STORE | Bin=B51 | Item=FA-9137 (Fan)
-00:01:28 | Stream → Sent STORE request: STORE | Bin=B35 | Item=BO-4095 (Box)

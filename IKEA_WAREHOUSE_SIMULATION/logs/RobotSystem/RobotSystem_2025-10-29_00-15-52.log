@@ -1,3 +1,0 @@
-00:15:52 | ⚠️ AGV L2 (loader) low battery: 19%. → Sent to discharge queue.
-00:15:54 | Stream ← Received: STORE | Bin=B88 | Item=CA-8215 (Carpet)
-00:15:56 | Stream ← Received: RETRIEVE | Bin=B35 | Item=MO-5840 (Monitor)

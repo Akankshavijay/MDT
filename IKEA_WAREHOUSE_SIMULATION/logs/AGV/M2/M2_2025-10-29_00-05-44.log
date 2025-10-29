@@ -1,3 +1,0 @@
-00:05:44 | [BATTERY] M2 | Battery=39% | State=in-progress
-00:05:44 | [MOVER] M2 | STORE | Bin=B62 | Item=CA-8681 (Cabinet) | Dist=0.00m | Battery=39% | State=in-progress
-00:05:44 | [MOVER] M2 | RETRIEVE | Bin=B4 | Item=FA-1144 (Fan) | Dist=0.00m | Battery=39% | State=in-progress

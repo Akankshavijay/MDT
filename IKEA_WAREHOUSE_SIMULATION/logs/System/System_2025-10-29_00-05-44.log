@@ -1,5 +1,0 @@
-00:05:44 | STORE → Table (TA-7605) → B44
-00:05:44 | RETRIEVE from B4
-00:05:46 | STORE: Item{TA-5869, type=Table} → B17
-00:05:47 | RETRIEVE → B44
-00:05:48 | STORE: Item{DE-1042, type=Desk} → B64

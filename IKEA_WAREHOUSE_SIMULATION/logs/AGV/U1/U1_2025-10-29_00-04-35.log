@@ -1,3 +1,0 @@
-00:04:35 | [BATTERY] U1 | Battery=39% | State=in-progress
-00:04:35 | [UNLOADER] U1 | STORE | Bin=B57 | Item=BO-8138 (Box) | Dist=0.00m | Battery=39% | State=in-progress
-00:04:35 | [UNLOADER] U1 | RETRIEVE | Bin=B59 | Item=LA-8053 (Lamp) | Dist=0.00m | Battery=39% | State=in-progress

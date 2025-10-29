@@ -1,3 +1,0 @@
-00:14:52 | [BATTERY] M1 | Battery=44% | State=in-progress
-00:14:52 | [MOVER] M1 | STORE | Bin=B29 | Item=MO-7240 (Monitor) | Dist=0.00m | Battery=44% | State=in-progress
-00:14:52 | [MOVER] M1 | RETRIEVE | Bin=B60 | Item=FA-9489 (Fan) | Dist=0.00m | Battery=44% | State=in-progress

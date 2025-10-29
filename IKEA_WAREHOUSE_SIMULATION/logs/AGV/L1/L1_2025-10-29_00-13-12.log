@@ -1,3 +1,0 @@
-00:13:12 | [BATTERY] L1 | Battery=65% | State=in-progress
-00:13:12 | [LOADER] L1 | STORE | Bin=B97 | Item=CH-3742 (Chair) | Dist=0.00m | Battery=65% | State=in-progress
-00:13:12 | [LOADER] L1 | RETRIEVE | Bin=B41 | Item=SO-3202 (Sofa) | Dist=0.00m | Battery=65% | State=in-progress

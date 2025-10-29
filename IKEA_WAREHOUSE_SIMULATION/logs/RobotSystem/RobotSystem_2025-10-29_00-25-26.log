@@ -1,3 +1,0 @@
-00:25:26 | Stream ← Received: RETRIEVE | Bin=B91 | Item=SH-8769 (Shelf)
-00:25:26 | ⚠️ No available robots for task: RETRIEVE | Bin=B91 | Item=SH-8769 (Shelf)
-00:25:30 | Stream ← Received: STORE | Bin=B52 | Item=FA-4025 (Fan)

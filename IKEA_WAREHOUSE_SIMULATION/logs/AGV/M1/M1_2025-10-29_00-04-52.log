@@ -1,3 +1,0 @@
-00:04:52 | [BATTERY] M1 | Battery=67% | State=in-progress
-00:04:52 | [MOVER] M1 | RETRIEVE | Bin=B32 | Item=CH-4807 (Chair) | Dist=0.00m | Battery=67% | State=in-progress
-00:04:52 | [MOVER] M1 | STORE | Bin=B52 | Item=DE-3342 (Desk) | Dist=0.00m | Battery=24% | State=in-progress

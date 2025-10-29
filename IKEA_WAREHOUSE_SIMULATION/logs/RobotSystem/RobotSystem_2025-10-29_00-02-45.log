@@ -1,3 +1,0 @@
-00:02:45 | Stream ← Received: STORE | Bin=B22 | Item=BE-8968 (Bed)
-00:02:49 | Stream ← Received: RETRIEVE | Bin=B32 | Item=BE-298 (Bed)
-00:02:49 | No available robots for: RETRIEVE | Bin=B32 | Item=BE-298 (Bed)
