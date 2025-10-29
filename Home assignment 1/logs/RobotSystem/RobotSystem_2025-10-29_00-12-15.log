@@ -1,0 +1,6 @@
+00:12:15 | Stream ← Received: STORE | Bin=B69 | Item=LA-8573 (Lamp)
+00:12:15 | ⚠️ No available robots for task: STORE | Bin=B69 | Item=LA-8573 (Lamp)
+00:12:18 | Stream ← Received: STORE | Bin=B35 | Item=CA-3749 (Carpet)
+00:12:18 | ⚠️ No available robots for task: STORE | Bin=B35 | Item=CA-3749 (Carpet)
+00:12:20 | Stream ← Received: STORE | Bin=B68 | Item=BO-6992 (Box)
+00:12:20 | ⚠️ No available robots for task: STORE | Bin=B68 | Item=BO-6992 (Box)

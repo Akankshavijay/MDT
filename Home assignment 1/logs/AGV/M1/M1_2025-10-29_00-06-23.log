@@ -1,0 +1,2 @@
+00:06:23 | [BATTERY] M1 | Battery=42% | State=in-progress
+00:06:23 | [MOVER] M1 | RETRIEVE | Bin=B80 | Item=CH-9096 (Chair) | Dist=0.00m | Battery=42% | State=in-progress

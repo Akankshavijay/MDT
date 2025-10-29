@@ -1,0 +1,3 @@
+00:04:41 | [BATTERY] M1 | Battery=70% | State=in-progress
+00:04:41 | [MOVER] M1 | STORE | Bin=B48 | Item=TA-2328 (Table) | Dist=0.00m | Battery=70% | State=in-progress
+00:04:41 | [MOVER] M1 | RETRIEVE | Bin=B98 | Item=SO-2428 (Sofa) | Dist=0.00m | Battery=27% | State=in-progress

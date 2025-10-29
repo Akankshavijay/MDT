@@ -1,0 +1,3 @@
+00:14:10 | [BATTERY] U2 | Battery=48% | State=in-progress
+00:14:10 | [UNLOADER] U2 | STORE | Bin=B39 | Item=CA-5454 (Cabinet) | Dist=0.00m | Battery=48% | State=in-progress
+00:14:10 | [UNLOADER] U2 | RETRIEVE | Bin=B87 | Item=SO-3818 (Sofa) | Dist=0.00m | Battery=48% | State=in-progress

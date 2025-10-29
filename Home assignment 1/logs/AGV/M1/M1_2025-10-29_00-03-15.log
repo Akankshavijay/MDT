@@ -1,0 +1,3 @@
+00:03:15 | [BATTERY] M1 | Battery=54% | State=in-progress
+00:03:15 | [MOVER] M1 | STORE | Bin=B66 | Item=LA-6540 (Lamp) | Dist=0.00m | Battery=54% | State=in-progress
+00:03:15 | [MOVER] M1 | STORE | Bin=B40 | Item=SH-8395 (Shelf) | Dist=0.00m | Battery=54% | State=in-progress

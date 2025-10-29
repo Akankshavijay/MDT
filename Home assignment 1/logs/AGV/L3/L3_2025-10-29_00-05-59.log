@@ -1,0 +1,4 @@
+00:05:59 | [BATTERY] L3 | Battery=33% | State=in-progress
+00:05:59 | [LOADER] L3 | STORE | Bin=B83 | Item=MO-7366 (Monitor) | Dist=0.00m | Battery=33% | State=in-progress
+00:05:59 | [BATTERY] L3 | Battery=55% | State=in-progress
+00:05:59 | [LOADER] L3 | RETRIEVE | Bin=B10 | Item=CA-1868 (Carpet) | Dist=0.00m | Battery=55% | State=in-progress

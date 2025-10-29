@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-10-28T20:03:29.243257800",
+  "warehouseMap": {
+    "entries": [
+      {"id": "EntryGate-A", "x": 71, "y": 80}
+    ],
+    "exits": [
+      {"id": "ExitGate-1", "x": 11, "y": 57}
+    ],
+    "chargingStations": [
+      {"id": "ChargeSlot-3", "x": 47, "y": 78},
+      {"id": "ChargeSlot-1", "x": 52, "y": 69},
+      {"id": "ChargeSlot-2", "x": 16, "y": 97}
+    ],
+    "bins": [
+      {"id": "X1", "x": 78, "y": 68, "occupied": false, "distanceToEntry": 13.89, "distanceToExit": 67.90},
+      {"id": "X2", "x": 65, "y": 31, "occupied": false, "distanceToEntry": 49.37, "distanceToExit": 59.93},
+      {"id": "X3", "x": 88, "y": 71, "occupied": false, "distanceToEntry": 19.24, "distanceToExit": 78.26}
+    ]
+  }
+}

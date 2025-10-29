@@ -1,0 +1,3 @@
+00:04:06 | [BATTERY] L2 | Battery=56% | State=in-progress
+00:04:06 | [LOADER] L2 | RETRIEVE | Bin=B25 | Item=BE-471 (Bed) | Dist=0.00m | Battery=56% | State=in-progress
+00:04:06 | [LOADER] L2 | STORE | Bin=B28 | Item=DE-7547 (Desk) | Dist=0.00m | Battery=56% | State=in-progress

@@ -1,0 +1,3 @@
+00:03:46 | Stream ← Received: RETRIEVE | Bin=B82 | Item=CA-3954 (Cabinet)
+00:03:48 | Stream ← Received: STORE | Bin=B61 | Item=LA-6502 (Lamp)
+00:03:51 | Stream ← Received: RETRIEVE | Bin=B26 | Item=LA-7165 (Lamp)

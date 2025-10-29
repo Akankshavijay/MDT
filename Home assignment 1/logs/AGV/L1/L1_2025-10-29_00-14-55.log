@@ -1,0 +1,3 @@
+00:14:55 | [BATTERY] L1 | Battery=31% | State=in-progress
+00:14:55 | [LOADER] L1 | STORE | Bin=B29 | Item=MO-7240 (Monitor) | Dist=0.00m | Battery=31% | State=in-progress
+00:14:55 | [LOADER] L1 | RETRIEVE | Bin=B13 | Item=BO-2313 (Box) | Dist=0.00m | Battery=31% | State=in-progress

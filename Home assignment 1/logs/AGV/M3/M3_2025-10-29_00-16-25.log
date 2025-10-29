@@ -1,0 +1,3 @@
+00:16:25 | [BATTERY] M3 | Battery=63% | State=in-progress
+00:16:25 | [MOVER] M3 | RETRIEVE | Bin=B43 | Item=KE-7580 (Keyboard) | Dist=0.00m | Battery=63% | State=in-progress
+00:16:25 | [MOVER] M3 | RETRIEVE | Bin=B83 | Item=LA-603 (Lamp) | Dist=0.00m | Battery=63% | State=in-progress

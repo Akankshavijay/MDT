@@ -1,0 +1,4 @@
+00:04:55 | [BATTERY] L3 | Battery=67% | State=in-progress
+00:04:55 | [LOADER] L3 | RETRIEVE | Bin=B32 | Item=CH-4807 (Chair) | Dist=0.00m | Battery=67% | State=in-progress
+00:04:55 | [BATTERY] L3 | Battery=45% | State=in-progress
+00:04:55 | [LOADER] L3 | STORE | Bin=B34 | Item=KE-1633 (Keyboard) | Dist=0.00m | Battery=45% | State=in-progress

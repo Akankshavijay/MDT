@@ -1,0 +1,5 @@
+00:05:12 | [BATTERY] L2 | Battery=57% | State=in-progress
+00:05:12 | [LOADER] L2 | RETRIEVE | Bin=B35 | Item=CA-4431 (Carpet) | Dist=0.00m | Battery=57% | State=in-progress
+00:05:12 | [BATTERY] L2 | Battery=36% | State=in-progress
+00:05:12 | [LOADER] L2 | RETRIEVE | Bin=B34 | Item=DE-4866 (Desk) | Dist=0.00m | Battery=36% | State=in-progress
+00:05:12 | [LOADER] L2 | RETRIEVE | Bin=B35 | Item=MO-689 (Monitor) | Dist=0.00m | Battery=57% | State=in-progress

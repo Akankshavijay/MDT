@@ -1,0 +1,3 @@
+00:04:23 | Stream ← Received: RETRIEVE | Bin=B83 | Item=BO-9675 (Box)
+00:04:25 | Stream ← Received: RETRIEVE | Bin=B75 | Item=CH-951 (Chair)
+00:04:28 | Stream ← Received: STORE | Bin=B57 | Item=BO-8138 (Box)

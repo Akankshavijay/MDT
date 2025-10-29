@@ -1,0 +1,4 @@
+00:04:48 | [BATTERY] M1 | Battery=25% | State=in-progress
+00:04:48 | [MOVER] M1 | STORE | Bin=B64 | Item=DE-8649 (Desk) | Dist=0.00m | Battery=25% | State=in-progress
+00:04:48 | [BATTERY] M1 | Battery=68% | State=in-progress
+00:04:48 | [MOVER] M1 | STORE | Bin=B92 | Item=RO-3506 (Router) | Dist=0.00m | Battery=68% | State=in-progress

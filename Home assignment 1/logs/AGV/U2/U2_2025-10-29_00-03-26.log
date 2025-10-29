@@ -1,0 +1,3 @@
+00:03:26 | [BATTERY] U2 | Battery=57% | State=in-progress
+00:03:26 | [UNLOADER] U2 | RETRIEVE | Bin=B3 | Item=KE-4853 (Keyboard) | Dist=0.00m | Battery=57% | State=in-progress
+00:03:26 | [UNLOADER] U2 | STORE | Bin=B90 | Item=SH-6243 (Shelf) | Dist=0.00m | Battery=57% | State=in-progress

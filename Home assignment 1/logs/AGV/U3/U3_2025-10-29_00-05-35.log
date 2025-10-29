@@ -1,0 +1,3 @@
+00:05:35 | [UNLOADER] U3 | RETRIEVE | Bin=B94 | Item=DE-8364 (Desk) | Dist=0.00m | Battery=21% | State=in-progress
+00:05:35 | [BATTERY] U3 | Battery=53% | State=in-progress
+00:05:35 | [UNLOADER] U3 | STORE | Bin=B30 | Item=RO-4020 (Router) | Dist=0.00m | Battery=53% | State=in-progress

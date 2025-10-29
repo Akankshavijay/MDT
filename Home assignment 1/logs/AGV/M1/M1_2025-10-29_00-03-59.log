@@ -1,0 +1,3 @@
+00:03:59 | [BATTERY] M1 | Battery=40% | State=in-progress
+00:03:59 | [MOVER] M1 | STORE | Bin=B81 | Item=MO-4965 (Monitor) | Dist=0.00m | Battery=40% | State=in-progress
+00:03:59 | [MOVER] M1 | RETRIEVE | Bin=B10 | Item=LA-3530 (Lamp) | Dist=0.00m | Battery=40% | State=in-progress

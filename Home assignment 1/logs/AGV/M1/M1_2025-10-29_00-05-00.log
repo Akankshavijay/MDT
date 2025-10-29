@@ -1,0 +1,3 @@
+00:05:00 | [MOVER] M1 | STORE | Bin=B73 | Item=CH-8200 (Chair) | Dist=0.00m | Battery=22% | State=in-progress
+00:05:00 | [BATTERY] M1 | Battery=64% | State=in-progress
+00:05:00 | [MOVER] M1 | RETRIEVE | Bin=B30 | Item=KE-6296 (Keyboard) | Dist=0.00m | Battery=64% | State=in-progress

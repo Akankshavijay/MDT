@@ -1,0 +1,5 @@
+00:05:18 | RETRIEVE → B19
+00:05:18 | STORE: Item{KE-3767, type=Keyboard} → B67
+00:05:19 | STORE → Desk (DE-1910) → B97
+00:05:19 | RETRIEVE from B71
+00:05:23 | STORE: Item{DE-1434, type=Desk} → B84

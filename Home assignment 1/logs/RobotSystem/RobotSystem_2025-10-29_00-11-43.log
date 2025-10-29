@@ -1,0 +1,4 @@
+00:11:43 | Initialized 35 AGVs (L=10, M=15, U=10)
+00:11:43 | AGVManager stream listener started.
+00:11:43 | Stream ← Received: STORE | Bin=B77 | Item=RO-2834 (Router)
+00:11:45 | Stream ← Received: RETRIEVE | Bin=B75 | Item=KE-1221 (Keyboard)

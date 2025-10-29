@@ -1,0 +1,3 @@
+00:06:03 | [BATTERY] L1 | Battery=48% | State=in-progress
+00:06:03 | [LOADER] L1 | STORE | Bin=B98 | Item=FA-6585 (Fan) | Dist=0.00m | Battery=48% | State=in-progress
+00:06:03 | [LOADER] L1 | RETRIEVE | Bin=B62 | Item=SO-7874 (Sofa) | Dist=0.00m | Battery=48% | State=in-progress

@@ -1,0 +1,6 @@
+00:05:14 | [BATTERY] U1 | Battery=57% | State=in-progress
+00:05:14 | [UNLOADER] U1 | RETRIEVE | Bin=B35 | Item=CA-4431 (Carpet) | Dist=0.00m | Battery=57% | State=in-progress
+00:05:14 | [BATTERY] U1 | Battery=24% | State=in-progress
+00:05:14 | [UNLOADER] U1 | RETRIEVE | Bin=B34 | Item=DE-4866 (Desk) | Dist=0.00m | Battery=24% | State=in-progress
+00:05:14 | [UNLOADER] U1 | RETRIEVE | Bin=B43 | Item=CH-8977 (Chair) | Dist=0.00m | Battery=24% | State=in-progress
+00:05:14 | [UNLOADER] U1 | STORE | Bin=B31 | Item=DE-9308 (Desk) | Dist=0.00m | Battery=57% | State=in-progress
