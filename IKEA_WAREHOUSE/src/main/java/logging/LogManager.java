@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class LogManager {
-    private final File baseDir = new File("logs");
+    private final File baseDir = new File("target/logs");
     private final Map<String, BufferedWriter> writers = new HashMap<>();
     private final Map<String, Long> lastWrite = new HashMap<>();
     private final DateTimeFormatter fileFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
