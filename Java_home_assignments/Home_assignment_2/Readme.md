@@ -3,5 +3,5 @@
 | Team Member | Role Description |
 |--------------|------------------|
 | **Akanksha Vijayvergiya** | Multiple Exception Handler and Rethrow exception and unit tests |
-| **Alisa Khabibrakhmanova** |  |
-| **Mikhail Smolkin** |  |
+| **Alisa Khabibrakhmanova** | Resource Management |
+| **Mikhail Smolkin** | Chaining Exceptions |

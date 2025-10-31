@@ -8,8 +8,8 @@
 | Team Member | Role Description |
 |--------------|------------------|
 | **Akanksha Vijayvergiya** | Logging Framework, Meta-data Logging Handling and Unit Tests, Warehouse Map, Storage Manager and Unit Tests |
-| **Alisa Khabibrakhmanova** |  |
-| **Mikhail Smolkin]** |  |
+| **Alisa Khabibrakhmanova** | TaskManager |
+| **Mikhail Smolkin]** | Architecture, Tests |
 
 ---
 
