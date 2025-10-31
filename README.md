@@ -6,6 +6,22 @@ Akanksha Vijayvergiya MDT *7224287*
 
 Mikhail Smolkin MDT *7224696*
 
+# Structure
+
+## IKEA_WAREHOUSE - Capstone project folder
+docs - all documents and notes
+src - source files and tests
+target - generated files, logs and reports
+
+../java - java files
+../resources - configs, resources and operational files
+
+## Java_workshops - Workshops folder
+
+To REMOVE and REPLACE with git branches:
+## Java_home_assignments - Files and demos for home_assignments
+
+
 ## Self-assessment Task 1
 1. Mikhail Smolkin
 2. Akanksha Vijayvergiya

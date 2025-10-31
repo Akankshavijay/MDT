@@ -1,4 +1,0 @@
-03:54:06 | Storage system initialized with max bins: 5
-03:54:06 | Stream → Sent STORE request: STORE | Bin=B1 | Item=I001 (Chair)
-03:54:07 | Stream → Sent STORE request: STORE | Bin=B2 | Item=I002 (Table)
-03:54:08 | Stream → Sent RETRIEVE request: RETRIEVE | Bin=B1 | Item=I001 (Chair)
