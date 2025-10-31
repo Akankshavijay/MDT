@@ -1,14 +1,13 @@
-package main.java.TaskManager;
+package main.java.taskManager;
 
 import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import main.java.Communication.WarehouseMessage;
-import main.java.Logging.LogManager;
-import main.java.StorageManagement.Item;
-import main.java.StorageManagement.StorageManager;
-import main.java.ExceptionHandler.TaskManagerException;
+import main.java.exceptionHandler.TaskManagerException;
+import main.java.logging.LogManager;
+import main.java.storageManagement.Item;
+import main.java.storageManagement.StorageManager;
 
 public class TaskManager {
 

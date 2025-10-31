@@ -1,4 +1,4 @@
-package main.java.Logging;
+package main.java.logging;
 
 import java.io.*;
 import java.nio.file.*;

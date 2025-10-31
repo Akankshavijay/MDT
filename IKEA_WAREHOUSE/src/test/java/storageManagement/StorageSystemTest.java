@@ -1,13 +1,14 @@
-package test.java.StorageManagement;
+package test.java.storageManagement;
 
 import java.io.*;
-import main.java.Communication.WarehouseMessage;
-import main.java.ExceptionHandler.WarehouseException;
-import main.java.Logging.LogManager;
-import main.java.StorageManagement.Bin;
-import main.java.StorageManagement.Item;
-import main.java.StorageManagement.StorageManager;
-import main.java.WarehouseMap.WarehouseMap;
+
+import main.java.communication.WarehouseMessage;
+import main.java.exceptionHandler.WarehouseException;
+import main.java.logging.LogManager;
+import main.java.storageManagement.Bin;
+import main.java.storageManagement.Item;
+import main.java.storageManagement.StorageManager;
+import main.java.warehouseMap.WarehouseMap;
 
 public class StorageSystemTest {
 

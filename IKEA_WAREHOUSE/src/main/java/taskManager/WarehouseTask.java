@@ -1,4 +1,4 @@
-package main.java.TaskManager;
+package main.java.taskManager;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

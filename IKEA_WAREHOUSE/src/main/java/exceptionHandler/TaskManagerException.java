@@ -1,4 +1,4 @@
-package main.java.ExceptionHandler;
+package main.java.exceptionHandler;
 
 public class TaskManagerException extends RuntimeException {
     /**

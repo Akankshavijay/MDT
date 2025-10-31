@@ -1,4 +1,4 @@
-package main.java.TaskManager;
+package main.java.taskManager;
 
 public enum TaskState {
     STANDING_BY,
