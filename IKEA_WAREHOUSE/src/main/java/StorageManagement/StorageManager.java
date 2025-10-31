@@ -1,9 +1,9 @@
-package StorageManagement;
+package main.java.StorageManagement;
 
-import Communication.WarehouseMessage;
-import Logging.LogManager;
-import Exception_Handler.WarehouseException;
-import warehouse_map.WarehouseMap;
+import main.java.Communication.WarehouseMessage;
+import main.java.Logging.LogManager;
+import main.java.ExceptionHandler.WarehouseException;
+import main.java.WarehouseMap.WarehouseMap;
 
 import java.io.*;
 import java.util.*;

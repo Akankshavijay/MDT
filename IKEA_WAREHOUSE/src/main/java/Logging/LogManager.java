@@ -1,4 +1,4 @@
-package Logging;
+package main.java.Logging;
 
 import java.io.*;
 import java.time.*;

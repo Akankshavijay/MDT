@@ -1,15 +1,8 @@
-package TaskManager;
+package main.java.TaskManager;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public enum TaskState {
-    STANDING_BY,
-    IN_PROGRESS,
-    CANCELED,
-    DONE,
-    ERROR
-}
 
 public class WarehouseTask implements Serializable {
     private static final long serialVersionUID = 1L;

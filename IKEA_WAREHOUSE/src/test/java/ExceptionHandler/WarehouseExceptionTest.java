@@ -1,6 +1,8 @@
-package Exception_Handler;
+package test.java.ExceptionHandler;
 
 import java.io.*;
+
+import main.java.ExceptionHandler.WarehouseException;
 
 // This class runs test functions for all warehouse exception handling cases
 public class WarehouseExceptionTest {

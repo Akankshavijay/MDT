@@ -1,4 +1,4 @@
-package Exception_Handler;
+package main.java.ExceptionHandler;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -1,4 +1,4 @@
-package StorageManagement;
+package main.java.StorageManagement;
 
 import java.util.Random;
 import java.util.List;

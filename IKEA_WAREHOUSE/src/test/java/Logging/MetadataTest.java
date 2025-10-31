@@ -1,7 +1,9 @@
-package Logging;
+package test.java.Logging;
 
 
 import java.io.File;
+
+import main.java.Logging.LogMetadataManager;
 
 public class MetadataTest {
     public static void main(String[] args) {

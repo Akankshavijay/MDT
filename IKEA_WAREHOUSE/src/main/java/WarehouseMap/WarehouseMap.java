@@ -1,7 +1,8 @@
-package warehouse_map;
+package main.java.WarehouseMap;
 
-import StorageManagement.*;
 import java.util.*;
+
+import main.java.StorageManagement.Bin;
 
 public class WarehouseMap implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
