@@ -1,6 +1,7 @@
 package main.java.exceptionHandler;
 
 public class TaskManagerException extends RuntimeException {
+	
     /**
 	 * 
 	 */
@@ -10,7 +11,12 @@ public class TaskManagerException extends RuntimeException {
         super(message);
     }
 
+    public TaskManagerException(Throwable cause) {
+        super(cause);
+    }
+
     public TaskManagerException(String message, Throwable cause) {
         super(message, cause);
     }
 }
+

@@ -157,6 +157,32 @@ public class TaskManagerTest {
     public void startUnknownTask_throws() {
         assertThrows(TaskManagerException.class, () -> taskManager.startTask("NO_SUCH"));
     }
+    
+    @Test
+    public void startTask_whenStorageManagerHasNoStream_resultsInChainedException() {
+        // arrange: task that should be valid
+        WarehouseTask t = taskManager.addTask("T_ERR", "store", "B1", "I777", "BOX");
+        assertEquals(TaskState.STANDING_BY, t.getState());
+
+        // break StorageManager's output stream so requestStore(...) will blow up
+        storageManager.connectStream(null);
+
+        // act + assert
+        TaskManagerException ex = assertThrows(
+                TaskManagerException.class,
+                () -> taskManager.startTask("T_ERR")
+        );
+        
+        // ex.printStackTrace(); // show trace, comment after screencast
+
+        // we expect TaskManager to wrap the original RuntimeException (here: NPE)
+        assertNotNull(ex.getCause(), "Chained cause must be present");
+        assertTrue(ex.getCause() instanceof NullPointerException,
+                "Expected StorageManager to fail with NullPointerException as cause");
+
+        // and task should be marked as ERROR
+        assertEquals(TaskState.ERROR, t.getState());
+    }
 
     // ---------------------------------------------------------------------
     // helpers
