@@ -9,7 +9,7 @@
 |--------------|------------------|
 | **Akanksha Vijayvergiya** | Multiple Exception Handler and Rethrow exception and Unit Tests |
 | **Alisa Khabibrakhmanova** |  |
-| **Mikhail Smolkin]** |  |
+| **Mikhail Smolkin** |  |
 
 ---
 
