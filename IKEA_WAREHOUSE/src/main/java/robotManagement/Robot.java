@@ -1,8 +1,11 @@
 package main.java.robotManagement;
 
+import main.java.logging.LogManager;
+
 public class Robot implements Runnable {
     public enum Status { READY, ERROR, BUSY, WAITING, CHARGING }
-
+    private final LogManager logger;
+    private final String systemName;
     private final String id;
     private Status status = Status.READY;
     private int battery = 100;
@@ -15,11 +18,14 @@ public class Robot implements Runnable {
     private final int batteryDrainPerStep = 1;
     private final int stepTime = 50;
 
-    public Robot(String id, int startX, int startY, int initialBattery) {
+    public Robot(String id, int startX, int startY, int initialBattery, String systemName, LogManager logger) {
         this.id = id;
         this.x = startX;
         this.y = startY;
         this.battery = Math.max(0, Math.min(100, initialBattery));
+        this.systemName = systemName;
+        this.logger = logger;
+        logger.log(systemName, "Robot initialized " + id);
     }
 
     public String getId() {
@@ -48,6 +54,7 @@ public class Robot implements Runnable {
 
     public void setTask(RobotTask task) {
         currentTask = task;
+        logger.log(systemName, "Task set" + task.toString());
     }
 
     public void moveTo(int nx, int ny) {
@@ -68,7 +75,8 @@ public class Robot implements Runnable {
             drainBattery(batteryDrainPerStep);
             sleepMillis(stepTime);
         }
-        status = Status.READY;
+        logger.log(systemName, "Robot " + this.id + " moved to " + nx + ny);
+        onChargeComplete();
     }
 
     public void sleepMinutes(long minutes) {
@@ -85,25 +93,27 @@ public class Robot implements Runnable {
 
     public void increaseBatteryPercent(int pct) {
         battery = Math.max(0, Math.min(100, battery + pct));
+        logger.log(systemName, "Robot " + this.id + " increased battery on " + pct);
     }
 
     void drainBattery(int pct) {
         battery = Math.max(0, battery - pct);
+        logger.log(systemName, "Robot " + this.id + " drained battery on " + pct);
     }
 
     public void onChargeWait() {
         status = Status.WAITING;
-        // todo: log charging waiting
+        logger.log(systemName, "Robot " + this.id + " set status to WAITING");
     }
 
     public void onChargeStart() {
         status = Status.CHARGING;
-        // todo: log charging started
+        logger.log(systemName, "Robot " + this.id + " set status to CHARGING");
     }
 
     public void onChargeComplete() {
         status = Status.READY;
-        // todo: log charging completed
+        logger.log(systemName, "Robot " + this.id + " set status to READY");
     }
 
     public void stop() {
@@ -112,21 +122,25 @@ public class Robot implements Runnable {
 
     @Override
     public void run() {
-        // todo: log Robot thread started
+    	logger.log(systemName, "Robot thread started " + this.id);
         while (running) {
             RobotTask task = currentTask;
             if (task == null) {
                 currentTask = RobotTask.idle();
                 continue;
             }
-
+            // todo: loadout
             switch (task.getType()) {
                 case MOVE:
                     moveTo(task.getTargetX(), task.getTargetY());
                     currentTask = RobotTask.idle();
                     break;
                 case STORE:
-                // todo: simulate
+                    moveTo(task.getTargetX(), task.getTargetY());
+                    drainBattery(2);
+                    sleepMinutes(1);
+                    currentTask = RobotTask.idle();
+                    break;
                 case RETRIEVE:
                     moveTo(task.getTargetX(), task.getTargetY());
                     drainBattery(2);
@@ -134,14 +148,21 @@ public class Robot implements Runnable {
                     currentTask = RobotTask.idle();
                     break;
                 case CHARGE:
-                	//todo: move to charging station
-                	status = Status.WAITING;
+                	if (getX() != task.getTargetX() || getY() != task.getTargetY()) {
+                        moveTo(task.getTargetX(), task.getTargetY());
+                    } else {
+                        // once at station, wait for ChargingStation to charge
+                    	onChargeWait();
+                    	sleepMillis(1000);
+                    }
+                	break;
                 case IDLE:
+                	sleepMillis(1000);
                 default:
-                    sleepMinutes(1);
+                	sleepMillis(1000);
                     break;
             }
         }
-        // todo: log Robot thread stopped
+        logger.log(systemName, "Robot thread stopped " + this.id);
     }
 }

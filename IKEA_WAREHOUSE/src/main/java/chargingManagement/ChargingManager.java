@@ -2,20 +2,31 @@ package main.java.chargingManagement;
 
 import java.util.*;
 import java.util.concurrent.*;
+
+import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
+import main.java.robotManagement.RobotTask;
 
 public class ChargingManager implements Runnable {
     private final List<ChargingStation> stations = new CopyOnWriteArrayList<>();
     private final ConcurrentLinkedQueue<Robot> queue = new ConcurrentLinkedQueue<>();
+    private final LogManager logger;
+    private final String systemName;
 
     private double avgChargeMinutes = 10.0;
 
     private volatile boolean running = true;
 
-    public ChargingManager() {}
+    public ChargingManager(String systemName, 
+    		LogManager logger) {
+    	this.systemName = systemName;
+		this.logger = logger;
+		logger.log(systemName, "ChargingManager initialized");
+	}
 
     public void addStation(ChargingStation station) {
         stations.add(station);
+        logger.log(systemName, "Added station " + station.getId());
     }
 
     public void addRobotToQueue(Robot robot) {
@@ -67,20 +78,36 @@ public class ChargingManager implements Runnable {
         return totalWorkload / c;
     }
 
+    boolean tryAssignRobot(ChargingStation station, Robot robot) {
+        if (station.getStatus() == ChargingStation.Status.ERROR) return false;
+
+        robot.setTask(RobotTask.charge(station.getX(), station.getY()));
+
+        station.setCurrentRobot(robot);
+        station.setStatus(ChargingStation.Status.CHARGING);
+        logger.log(systemName, "Assigned robot " + robot.getId() + " to station " + station.getId());
+        return true;
+    }
+    
     public void stop() {
         running = false;
     }
 
     @Override
     public void run() {
-    	for (ChargingStation c : stations)
+    	for (ChargingStation c : stations) {
             new Thread(c, "Station-" + c.getId()).start();
+            logger.log(systemName, "Started station thread " + c.getId());
+    	}
     	
         while (running) {
             for (ChargingStation s : stations) {
                 if (s.getCurrentRobot() == null
                     && s.getStatus() == ChargingStation.Status.READY) {
-                	//todo: assign robot to station
+                	Robot r = queue.poll();
+                	if (r != null) {
+                		tryAssignRobot(s, r);
+                	}
                 }
             }
             try {
