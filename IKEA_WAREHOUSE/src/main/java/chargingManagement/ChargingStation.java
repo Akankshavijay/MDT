@@ -17,7 +17,7 @@ public class ChargingStation implements Runnable {
     private Status status = Status.READY;
     private Robot currentRobot = null;
 
-    private final int chargeRatePercentPerSecond = 1;
+    private final int chargeRatePercentPerSecond = 20;
     private volatile boolean running = true;
 
     public ChargingStation(
@@ -77,11 +77,10 @@ public class ChargingStation implements Runnable {
 
     @Override
     public void run() {
-    	logger.log(systemName, "Station thread started" + this.id);
+    	logger.log(systemName, "Station thread started " + this.id);
         while (running) {
             Robot r = currentRobot;
             if (r == null) {
-                setStatus(Status.READY);
                 try {
                     Thread.sleep(50);
                 } catch (InterruptedException e) {
@@ -93,9 +92,12 @@ public class ChargingStation implements Runnable {
             try {
                 if (r.getStatus() == Robot.Status.WAITING)
                     r.onChargeStart();
-                r.increaseBatteryPercent(chargeRatePercentPerSecond);
-                Thread.sleep(1000L);
-
+                
+                if (r.getStatus() == Robot.Status.CHARGING) {
+                	r.increaseBatteryPercent(chargeRatePercentPerSecond);
+                	Thread.sleep(1000L);
+                }
+                
                 if (r.getBattery() >= 99) {
                     r.onChargeComplete();
                     currentRobot = null;

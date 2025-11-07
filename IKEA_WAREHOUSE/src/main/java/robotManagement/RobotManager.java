@@ -60,8 +60,12 @@ public class RobotManager implements Runnable {
             if (eta <= maxAllowedWaitMinutes) {
                 if (!chargingManager.isQueued(r)) chargingManager.addRobotToQueue(r);
                 r.setTask(RobotTask.charge(r.getX(), r.getY()));
-                logger.log(systemName, "Set charging task to robot " + r.getId());
+                logger.log(systemName, "Set charging task to robot " + r.getId() + " bat: " + r.getBattery());
                 return true;
+            } else {
+            	r.setTask(RobotTask.idle());
+            	r.setStatus(Robot.Status.ERROR);
+            	logger.log(systemName, "ETA for robot " + r.getId() + " is too big: " + eta);
             }
         }
         return false;

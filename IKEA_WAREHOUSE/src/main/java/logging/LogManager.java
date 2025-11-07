@@ -11,7 +11,7 @@ public class LogManager {
     private final Map<String, BufferedWriter> writers = new HashMap<>();
     private final Map<String, Long> lastWrite = new HashMap<>();
     private final DateTimeFormatter fileFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
-    private final long ROTATION_INTERVAL_MS = 5000;
+    private final long ROTATION_INTERVAL_MS = 60000;
     private final Pattern jsonPattern = Pattern.compile(".*\\.json$");
 
     public LogManager() {
@@ -41,7 +41,7 @@ public class LogManager {
     public synchronized void log(String subsystem, String message) {
         try {
             BufferedWriter writer = getWriter(subsystem);
-            String line = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + " | " + message;
+            String line = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss:SSS")) + " | " + message;
             writer.write(line);
             writer.newLine();
             writer.flush();

@@ -25,7 +25,7 @@ public class Robot implements Runnable {
         this.battery = Math.max(0, Math.min(100, initialBattery));
         this.systemName = systemName;
         this.logger = logger;
-        logger.log(systemName, "Robot initialized " + id);
+        logger.log(systemName, "Robot initialized " + this.id);
     }
 
     public String getId() {
@@ -47,6 +47,13 @@ public class Robot implements Runnable {
     public Status getStatus() {
         return status;
     }
+    
+    public void setStatus(Status status) {
+    	if (this.status != status) { 
+    		this.status = status;
+    		logger.log(systemName, "Robot " + this.id + " set status " + status);
+    	}
+    }
 
     public RobotTask getCurrentTask() {
         return currentTask;
@@ -54,11 +61,12 @@ public class Robot implements Runnable {
 
     public void setTask(RobotTask task) {
         currentTask = task;
-        logger.log(systemName, "Task set" + task.toString());
+        logger.log(systemName, "Robot " + this.id + " set task " + task.toString());
     }
 
     public void moveTo(int nx, int ny) {
-        status = Status.BUSY;
+    	setStatus(Status.BUSY);
+    	logger.log(systemName, "Robot " + this.id + " started moving to " + nx + " " + ny + " from " + x + " " + y);
         int cx = x;
         int cy = y;
         while ((cx != nx || cy != ny) && running) {
@@ -75,8 +83,8 @@ public class Robot implements Runnable {
             drainBattery(batteryDrainPerStep);
             sleepMillis(stepTime);
         }
-        logger.log(systemName, "Robot " + this.id + " moved to " + nx + ny);
-        onChargeComplete();
+        logger.log(systemName, "Robot " + this.id + " moved to " + nx + " " + ny);
+        setStatus(Status.READY);
     }
 
     public void sleepMinutes(long minutes) {
@@ -96,24 +104,25 @@ public class Robot implements Runnable {
         logger.log(systemName, "Robot " + this.id + " increased battery on " + pct);
     }
 
-    void drainBattery(int pct) {
+    public void drainBattery(int pct) {
         battery = Math.max(0, battery - pct);
         logger.log(systemName, "Robot " + this.id + " drained battery on " + pct);
     }
 
     public void onChargeWait() {
-        status = Status.WAITING;
-        logger.log(systemName, "Robot " + this.id + " set status to WAITING");
+    	logger.log(systemName, "Robot " + this.id + " waiting for charging");
+    	setStatus(Status.WAITING);
     }
 
     public void onChargeStart() {
-        status = Status.CHARGING;
-        logger.log(systemName, "Robot " + this.id + " set status to CHARGING");
+    	logger.log(systemName, "Robot " + this.id + " started charging");
+    	setStatus(Status.CHARGING);
     }
 
     public void onChargeComplete() {
-        status = Status.READY;
-        logger.log(systemName, "Robot " + this.id + " set status to READY");
+    	logger.log(systemName, "Robot " + this.id + " completed charging");
+    	setStatus(Status.READY);
+    	currentTask = RobotTask.idle();
     }
 
     public void stop() {
@@ -151,7 +160,6 @@ public class Robot implements Runnable {
                 	if (getX() != task.getTargetX() || getY() != task.getTargetY()) {
                         moveTo(task.getTargetX(), task.getTargetY());
                     } else {
-                        // once at station, wait for ChargingStation to charge
                     	onChargeWait();
                     	sleepMillis(1000);
                     }
