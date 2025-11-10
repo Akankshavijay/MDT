@@ -1,25 +1,25 @@
 package main.java.storageManagement;
 
+import main.java.Manager;
 import main.java.communication.WarehouseMessage;
 import main.java.exceptionHandler.WarehouseException;
 import main.java.logging.LogManager;
+import main.java.robotManagement.Robot;
+import main.java.robotManagement.RobotTask;
 import main.java.warehouseMap.WarehouseMap;
 
 import java.io.*;
 import java.util.*;
 
-public class StorageManager {
+public class StorageManager extends Manager {
     private final Map<String, Bin> bins = new HashMap<>();
-    private final LogManager logger;
     private final WarehouseException handler;
-    private final String systemName;
     private final int maxBins;
     private final WarehouseMap warehouseMap;
     private ObjectOutputStream outStream;
 
     public StorageManager(String systemName, LogManager logger, WarehouseException handler, WarehouseMap warehouseMap, int maxBins) {
-        this.systemName = systemName;
-        this.logger = logger;
+        super(systemName, logger);
         this.handler = handler;
         this.maxBins = maxBins;
         this.warehouseMap = warehouseMap;
@@ -72,5 +72,10 @@ public class StorageManager {
     public Optional<Item> getItem(String binId) {
         Bin bin = bins.get(binId);
         return bin != null ? bin.getItem() : Optional.empty();
+    }
+    
+    @Override
+    protected void loopOnce() {
+        
     }
 }

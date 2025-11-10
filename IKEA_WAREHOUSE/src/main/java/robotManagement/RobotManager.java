@@ -2,26 +2,23 @@ package main.java.robotManagement;
 
 import java.util.*;
 import java.util.concurrent.*;
+
+import main.java.Manager;
 import main.java.chargingManagement.ChargingManager;
 import main.java.logging.LogManager;
 
-public class RobotManager implements Runnable {
+public class RobotManager extends Manager {
     private final Map<String, Robot> robots = new ConcurrentHashMap<>();
     private final BlockingQueue<RobotTask> tasks = new LinkedBlockingQueue<>();
     private ChargingManager chargingManager;
-    private final LogManager logger;
-    private final String systemName;
-
-    private volatile boolean running = true;
 
     private final int lowBatteryThreshold = 20;
     private final int maxAllowedWaitMinutes = 15;
 
     public RobotManager(String systemName, 
     		LogManager logger) {
-    	this.systemName = systemName;
-		this.logger = logger;
-		logger.log(systemName, "RobotManager initialized");
+    	super(systemName, logger);
+    	onInitialize();
 	}
 
     public void setChargingManager(ChargingManager chargingManager) {
@@ -70,35 +67,26 @@ public class RobotManager implements Runnable {
         }
         return false;
     }
-
-    public void stop() {
-        running = false;
-    }
-
+    
     @Override
-    public void run() {
+    protected void onStart() {
         for (Robot r : robots.values()) {
             new Thread(r, "Robot-" + r.getId()).start();
-        	logger.log(systemName, "Started robot thread" + r.getId());
+            logger.log(systemName, "Started robot thread" + r.getId());
         }
-        
-        while (running) {
-        	Optional<Robot> free = findFreeRobot();
-            if (free.isPresent()) {
-                Robot r = free.get();
-                if (!batteryIsLow(r)) {
-                	RobotTask task = tasks.poll();
-                	if (task != null) {
-                		r.setTask(task);      
-                		logger.log(systemName, "Set task to robot " + r.getId());
-                	}
+    }
+    
+    @Override
+    protected void loopOnce() {
+        Optional<Robot> free = findFreeRobot();
+        if (free.isPresent()) {
+            Robot r = free.get();
+            if (!batteryIsLow(r)) {
+                RobotTask task = tasks.poll();
+                if (task != null) {
+                    r.setTask(task);
+                    logger.log(systemName, "Set task to robot " + r.getId());
                 }
-            }
-
-            try {
-                Thread.sleep(50);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
         }
     }
