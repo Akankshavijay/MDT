@@ -6,6 +6,7 @@ import java.util.concurrent.*;
 import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
 import main.java.robotManagement.RobotTask;
+import main.java.exceptionHandler.*;
 
 import main.java.Manager;
 
@@ -76,7 +77,8 @@ public class ChargingManager extends Manager {
     }
 
     boolean tryAssignRobot(ChargingStation station, Robot robot) {
-        if (station.getStatus() == ChargingStation.Status.ERROR) return false;
+        if (station.getStatus() == ChargingStation.Status.ERROR) 
+        	throw new RobotCantBeAssignedException("Robot can't be assigned to charging station, station has status ERROR.");
 
         robot.setTask(RobotTask.charge(station.getX(), station.getY()));
 
@@ -100,7 +102,12 @@ public class ChargingManager extends Manager {
             if (s.getCurrentRobot() == null && s.getStatus() == ChargingStation.Status.READY) {
                 Robot r = queue.poll();
                 if (r != null) {
-                    tryAssignRobot(s, r);
+                	try {
+                		tryAssignRobot(s, r);
+                	} catch (RobotCantBeAssignedException e) {
+                		logger.log(systemName, e.getMessage());
+                	}
+                    
                 }
             }
         }
