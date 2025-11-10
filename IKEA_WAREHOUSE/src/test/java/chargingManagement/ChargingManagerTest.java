@@ -30,8 +30,8 @@ public class ChargingManagerTest {
     	rm.addRobot(r1);
     	rm.addRobot(r2);
 
-    	new Thread(cm, "ChargingManager").start();
-    	new Thread(rm, "RobotManager").start();
+    	cm.start();
+    	rm.start();
 
     	Thread.sleep(1000);
     	r2.drainBattery(3);
@@ -62,8 +62,8 @@ public class ChargingManagerTest {
     	rm.addRobot(r4);
     	rm.addRobot(r5);
 
-    	new Thread(cm, "ChargingManager").start();
-    	new Thread(rm, "RobotManager").start();
+    	cm.start();
+    	rm.start();
 
     	Thread.sleep(10000);
     	

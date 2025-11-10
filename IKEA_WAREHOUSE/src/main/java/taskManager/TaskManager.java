@@ -4,16 +4,15 @@ import java.io.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import main.java.Manager;
 import main.java.exceptionHandler.TaskManagerException;
 import main.java.logging.LogManager;
 import main.java.storageManagement.Item;
 import main.java.storageManagement.StorageManager;
 
-public class TaskManager {
+public class TaskManager extends Manager {
 
-    private final String systemName;
     private final StorageManager storageManager;
-    private final LogManager logger;
     private final File snapshotDir;
 
     private final List<WarehouseTask> tasks = new ArrayList<>();
@@ -25,9 +24,8 @@ public class TaskManager {
                        StorageManager storageManager,
                        LogManager logger,
                        File snapshotDir) {
-        this.systemName = systemName;
+    	super(systemName, logger);
         this.storageManager = storageManager;
-        this.logger = logger;
         this.snapshotDir = snapshotDir;
 
         if (!snapshotDir.exists()) {
@@ -214,6 +212,11 @@ public class TaskManager {
                 logger.log(systemName, "Error writing to char stream: " + e.getMessage());
             }
         }
+    }
+    
+    @Override
+    protected void loopOnce() {
+        
     }
 }
 

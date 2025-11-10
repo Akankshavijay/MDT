@@ -7,21 +7,18 @@ import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
 import main.java.robotManagement.RobotTask;
 
-public class ChargingManager implements Runnable {
+import main.java.Manager;
+
+public class ChargingManager extends Manager {
     private final List<ChargingStation> stations = new CopyOnWriteArrayList<>();
     private final ConcurrentLinkedQueue<Robot> queue = new ConcurrentLinkedQueue<>();
-    private final LogManager logger;
-    private final String systemName;
 
     private double avgChargeMinutes = 10.0;
 
-    private volatile boolean running = true;
-
     public ChargingManager(String systemName, 
     		LogManager logger) {
-    	this.systemName = systemName;
-		this.logger = logger;
-		logger.log(systemName, "ChargingManager initialized");
+    	super(systemName, logger);
+    	onInitialize();
 	}
 
     public void addStation(ChargingStation station) {
@@ -89,31 +86,22 @@ public class ChargingManager implements Runnable {
         return true;
     }
     
-    public void stop() {
-        running = false;
-    }
-
     @Override
-    public void run() {
-    	for (ChargingStation c : stations) {
+    protected void onStart() {
+        for (ChargingStation c : stations) {
             new Thread(c, "Station-" + c.getId()).start();
             logger.log(systemName, "Started station thread " + c.getId());
-    	}
-    	
-        while (running) {
-            for (ChargingStation s : stations) {
-                if (s.getCurrentRobot() == null
-                    && s.getStatus() == ChargingStation.Status.READY) {
-                	Robot r = queue.poll();
-                	if (r != null) {
-                		tryAssignRobot(s, r);
-                	}
+        }
+    }
+    
+    @Override
+    protected void loopOnce() {
+        for (ChargingStation s : stations) {
+            if (s.getCurrentRobot() == null && s.getStatus() == ChargingStation.Status.READY) {
+                Robot r = queue.poll();
+                if (r != null) {
+                    tryAssignRobot(s, r);
                 }
-            }
-            try {
-                Thread.sleep(20);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
             }
         }
     }
