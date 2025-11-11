@@ -5,15 +5,22 @@ import java.util.concurrent.*;
 
 import main.java.Manager;
 import main.java.chargingManagement.ChargingManager;
+import main.java.exceptionHandler.RobotManagerException;
 import main.java.logging.LogManager;
+import main.java.taskManager.TaskManager;
+import main.java.taskManager.WarehouseTask;
 
 public class RobotManager extends Manager {
+	private final int capacity = 1;
+	private final int lowBatteryThreshold = 20;
+	private final int maxAllowedWaitMinutes = 15;
+	
     private final Map<String, Robot> robots = new ConcurrentHashMap<>();
-    private final BlockingQueue<RobotTask> tasks = new LinkedBlockingQueue<>();
+    private final BlockingQueue<RobotTask> tasks = new LinkedBlockingQueue<>(capacity);
+    private final Map<String, WarehouseTask> taskBridge = new ConcurrentHashMap<>();
+    
     private ChargingManager chargingManager;
-
-    private final int lowBatteryThreshold = 20;
-    private final int maxAllowedWaitMinutes = 15;
+    private TaskManager taskManager;
 
     public RobotManager(String systemName, 
     		LogManager logger) {
@@ -24,6 +31,10 @@ public class RobotManager extends Manager {
     public void setChargingManager(ChargingManager chargingManager) {
           this.chargingManager = chargingManager;
     }
+    
+    public void setTaskManager(TaskManager taskManager) {
+        this.taskManager = taskManager;
+  }
 
     public void addRobot(Robot robot) {
         robots.put(robot.getId(), robot);
@@ -34,17 +45,28 @@ public class RobotManager extends Manager {
         return Optional.ofNullable(robots.get(id));
     }
 
-    public boolean submitTask(RobotTask task) {
-    	logger.log(systemName, "Submited task" + task.toString());
-        return tasks.offer(task);
+//    public boolean submitTask(RobotTask task) {
+//    	logger.log(systemName, "Submited task" + task.toString());
+//        return tasks.offer(task);
+//    }
+    
+    public boolean enqueueRobotTask(RobotTask robotTask, WarehouseTask source) throws RobotManagerException {
+        if (robotTask == null || source == null) {
+            throw new RobotManagerException("RobotTask and source WarehouseTask must not be null");
+        }
+        boolean ok = tasks.offer(robotTask);
+        if (!ok) {
+            throw new RobotManagerException("Robot task queue is full");
+        }
+        taskBridge.put(robotTask.getId(), source);
+        logger.log(systemName, "Enqueued robot task " + robotTask + " for warehouse task " + source.getId());
+        return true;
     }
 
     private Optional<Robot> findFreeRobot() {
         return robots.values()
             .stream()
-            .filter(r
-                -> r.getStatus() == Robot.Status.READY
-                    && r.getCurrentTask().getType() == RobotTask.Type.IDLE)
+            .filter(r -> r.getStatus() == Robot.Status.READY && r.getCurrentTask().getType() == RobotTask.Type.IDLE)
             .findFirst();
     }
 
@@ -56,7 +78,7 @@ public class RobotManager extends Manager {
             double eta = chargingManager.estimateWaitingTimeMinutes(r);
             if (eta <= maxAllowedWaitMinutes) {
                 if (!chargingManager.isQueued(r)) chargingManager.addRobotToQueue(r);
-                r.setTask(RobotTask.charge(r.getX(), r.getY()));
+                r.setTask(RobotTask.chargeAt(r.getX(), r.getY()));
                 logger.log(systemName, "Set charging task to robot " + r.getId() + " bat: " + r.getBattery());
                 return true;
             } else {
@@ -78,16 +100,51 @@ public class RobotManager extends Manager {
     
     @Override
     protected void loopOnce() {
+        RobotTask task = tasks.poll();
+        if (task == null) return;
+
         Optional<Robot> free = findFreeRobot();
-        if (free.isPresent()) {
-            Robot r = free.get();
-            if (!batteryIsLow(r)) {
-                RobotTask task = tasks.poll();
-                if (task != null) {
-                    r.setTask(task);
-                    logger.log(systemName, "Set task to robot " + r.getId());
-                }
+        if (!free.isPresent()) {
+            tasks.offer(task);
+            return;
+        }
+        Robot robot = free.get();
+        try {
+        	if (!batteryIsLow(robot)) {
+        		robot.setTask(task);
+        		logger.log(systemName, "Set task to robot " + robot.getId());
+        		}
+        	
+        	WarehouseTask src = taskBridge.remove(task.getId());
+        	if (src != null && taskManager != null) {
+        	    taskManager.onRobotTaskCompleted(task.getId(), true);
+        	}
+
+        } catch (Exception e) {
+            logger.log(systemName, "Robot execution error: " + e.getMessage());
+            WarehouseTask src = taskBridge.remove(task.getId());
+            
+            if (src != null && taskManager != null) {
+                taskManager.onRobotTaskCompleted(task.getId(), false);
             }
+
+        } finally {
+            robot.setStatus(Robot.Status.READY);
         }
     }
+    
+//    @Override
+//    protected void loopOnce() {
+//        Optional<Robot> free = findFreeRobot();
+//        if (free.isPresent()) {
+//            Robot r = free.get();
+//            if (!batteryIsLow(r)) {
+//                RobotTask task = tasks.poll();
+//                if (task != null) {
+//                    r.setTask(task);
+//                    logger.log(systemName, "Set task to robot " + r.getId());
+//                }
+//            }
+//        }
+//    }
 }

@@ -80,7 +80,7 @@ public class ChargingManager extends Manager {
         if (station.getStatus() == ChargingStation.Status.ERROR) 
         	throw new RobotCantBeAssignedException("Robot can't be assigned to charging station, station has status ERROR.");
 
-        robot.setTask(RobotTask.charge(station.getX(), station.getY()));
+        robot.setTask(RobotTask.chargeAt(station.getX(), station.getY()));
 
         station.setCurrentRobot(robot);
         station.setStatus(ChargingStation.Status.CHARGING);
