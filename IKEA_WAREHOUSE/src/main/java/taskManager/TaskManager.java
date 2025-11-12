@@ -102,17 +102,19 @@ public class TaskManager extends Manager {
         WarehouseTask wt = inFlight.remove(robotTaskId);
         
         if (wt == null) {
-            logger.log(systemName, "Orphan robot task completed: " + robotTaskId);
-            return;
+//            logger.log(systemName, "Orphan robot task completed: " + robotTaskId);
+            throw new TaskManagerException("Unknown robot task id: " + robotTaskId);
         }
         
         try {
             if (success) {
+            	String warehouseTaskId = wt.getId();
+            	
                 if (wt.getType() == TaskType.STORE) {
-                    storageManager.applyAfterRobot(TaskType.STORE, wt.getBinId(), robotTaskId, 
+                    storageManager.applyAfterRobot(TaskType.STORE, wt.getBinId(), warehouseTaskId, 
                     		new Item(wt.getItemId(), wt.getItemType()));
                 } else if (wt.getType() == TaskType.RETRIEVE) {
-                    storageManager.applyAfterRobot(TaskType.RETRIEVE, wt.getBinId(), robotTaskId, 
+                    storageManager.applyAfterRobot(TaskType.RETRIEVE, wt.getBinId(), warehouseTaskId, 
                     		null);
                 }
                 wt.setState(TaskState.DONE);
