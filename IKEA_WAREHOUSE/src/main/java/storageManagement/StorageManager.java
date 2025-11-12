@@ -8,7 +8,6 @@ import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
 import main.java.robotManagement.RobotTask;
 import main.java.taskManager.TaskType;
-import main.java.warehouseMap.WarehouseMap;
 
 import java.io.*;
 import java.util.*;
@@ -16,6 +15,11 @@ import java.util.*;
 public class StorageManager extends Manager {
     private final Map<String, Bin> bins = new HashMap<>();
 
+    public StorageManager(String systemName, LogManager logger) {
+        super(systemName, logger);
+        onInitialize();
+    }
+    
     public StorageManager(String systemName, LogManager logger, Collection<Bin> initialBins) {
         super(systemName, logger);
         for (Bin b : initialBins) {
@@ -32,6 +36,24 @@ public class StorageManager extends Manager {
         }
         
         return bins.values().stream().filter(b -> !b.isOccupied()).findFirst();
+    }
+    
+    public Optional<Bin> findAndReserveBinForStore(String preferredBinId, String taskId) {
+        if (preferredBinId != null) {
+            Bin b = bins.get(preferredBinId);
+            if (b != null && b.tryReserve(taskId)) return Optional.of(b);
+            return Optional.empty();
+        }
+        
+        for (Bin b : bins.values()) {
+            if (b.tryReserve(taskId)) return Optional.of(b);
+        }
+        return Optional.empty();
+    }
+    
+    public void releaseReservation(String binId, String taskId) throws StorageException {
+        Bin b = requireBin(binId);
+        b.releaseReservation(taskId);
     }
     
     public Optional<Bin> findOccupiedBinForRetrieve(String binId) {
@@ -56,49 +78,27 @@ public class StorageManager extends Manager {
         return b;
     }
     
-    public void applyAfterRobot(TaskType type, String binId, Item item) throws StorageException {
+    public void applyAfterRobot(TaskType type, String binId, String taskId,  Item item) throws StorageException {
         switch (type) {
             case STORE: {
                 Bin b = requireBin(binId);
                 if (b.isOccupied()) throw new StorageException("Bin " + binId + " already occupied");
                 if (item == null) throw new StorageException("Item must not be null for STORE");
-                b.put(item);
+                b.commitStore(taskId, item); // RESERVED to OCCUPIED
                 logger.log(systemName, "Item " + item + " stored to " + binId);
                 break;
             }
             case RETRIEVE: {
                 Bin b = requireBin(binId);
                 if (!b.isOccupied()) throw new StorageException("Bin " + binId + " is empty");
-                Item taken = b.take();
-                logger.log(systemName, "Item " + taken + " retrieved from " + binId);
+                b.commitRetrieve(); // OCCUPIED to FREE
+                logger.log(systemName, "Item " + item + " retrieved from " + binId);
                 break;
             }
             default:
                 throw new StorageException("Unsupported task type " + type);
         }
     }
-    
-//    public void requestStore(String binId, Item item) {
-//        try {
-//            WarehouseMessage msg = new WarehouseMessage("store", binId, item.getId(), item.getType());
-//            outStream.writeObject(msg);
-//            outStream.flush();
-//            logger.log(systemName, "Stream → Sent STORE request: " + msg);
-//        } catch (IOException e) {
-//            handler.handleWarehouseOperation(systemName, () -> { throw new RuntimeException(e); });
-//        }
-//    }
-//
-//    public void requestRetrieve(String binId, Item item) {
-//        try {
-//            WarehouseMessage msg = new WarehouseMessage("retrieve", binId, item.getId(), item.getType());
-//            outStream.writeObject(msg);
-//            outStream.flush();
-//            logger.log(systemName, "Stream → Sent RETRIEVE request: " + msg);
-//        } catch (IOException e) {
-//            handler.handleWarehouseOperation(systemName, () -> { throw new RuntimeException(e); });
-//        }
-//    }
 
     public boolean isBinOccupied(String binId) {
         Bin bin = bins.get(binId);

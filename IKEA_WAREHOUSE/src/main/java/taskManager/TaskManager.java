@@ -100,20 +100,27 @@ public class TaskManager extends Manager {
     // RobotManager callback
     public void onRobotTaskCompleted(String robotTaskId, boolean success) {
         WarehouseTask wt = inFlight.remove(robotTaskId);
+        
         if (wt == null) {
             logger.log(systemName, "Orphan robot task completed: " + robotTaskId);
             return;
         }
+        
         try {
             if (success) {
                 if (wt.getType() == TaskType.STORE) {
-                    storageManager.applyAfterRobot(TaskType.STORE, wt.getBinId(), new Item(wt.getItemId(), wt.getItemType()));
+                    storageManager.applyAfterRobot(TaskType.STORE, wt.getBinId(), robotTaskId, 
+                    		new Item(wt.getItemId(), wt.getItemType()));
                 } else if (wt.getType() == TaskType.RETRIEVE) {
-                    storageManager.applyAfterRobot(TaskType.RETRIEVE, wt.getBinId(), null);
+                    storageManager.applyAfterRobot(TaskType.RETRIEVE, wt.getBinId(), robotTaskId, 
+                    		null);
                 }
                 wt.setState(TaskState.DONE);
                 logger.log(systemName, "Warehouse task completed: " + wt.getId());
             } else {
+                if (wt.getType() == TaskType.STORE && wt.getBinId() != null) {
+                    storageManager.releaseReservation(wt.getBinId(), wt.getId());
+                }
                 wt.setState(TaskState.ERROR);
                 logger.log(systemName, "Warehouse task failed: " + wt.getId());
             }
@@ -271,15 +278,18 @@ public class TaskManager extends Manager {
         try {
             switch (next.getType()) {
                 case STORE: {
-                    Optional<Bin> free = storageManager.findFreeBinForStore(next.getBinId());
-                    if (!free.isPresent()) return; // nothing to do now
-                    Bin target = free.get();
+                	Optional<Bin> reserved = storageManager.findAndReserveBinForStore(next.getBinId(), next.getId());
+                    if (!reserved.isPresent()) return; // nothing to do now
+                    Bin target = reserved.get();
                     next.setBinId(target.getId());
+                    
                     RobotTask rt = TaskAdapter.toRobotTask(next, target);
                     boolean assigned = robotManager.enqueueRobotTask(rt, next);
                     if (assigned) {
                         next.setState(TaskState.IN_PROGRESS);
                         inFlight.put(rt.getId(), next);
+                    } else {
+                        storageManager.releaseReservation(target.getId(), next.getId());
                     }
                     break;
                 }
@@ -298,7 +308,7 @@ public class TaskManager extends Manager {
                 default:
                     throw new TaskManagerException("Unsupported task type: " + next.getType());
             }
-        } catch (TaskManagerException | RobotManagerException e) {
+        } catch (TaskManagerException | RobotManagerException | StorageException e) {
             next.setState(TaskState.ERROR);
             logger.log(systemName, "Failed to run task " + next.getId() + ": " + e.getMessage());
         }
