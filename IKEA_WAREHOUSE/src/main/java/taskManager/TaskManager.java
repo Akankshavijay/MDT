@@ -263,7 +263,7 @@ public class TaskManager extends Manager {
     }
     
     @Override
-    protected void loopOnce() {
+    public void loopOnce() {
         WarehouseTask next = null;
         synchronized (tasks) {
             for (WarehouseTask t : tasks) {
