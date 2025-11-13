@@ -23,7 +23,7 @@ public abstract class Manager implements Runnable {
 
     public final synchronized void stop() {
         running = false;
-        onStop();
+        logger.log(systemName, " got stop signal");
         if (thread != null) thread.interrupt();
     }
 

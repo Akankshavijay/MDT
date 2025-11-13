@@ -131,7 +131,6 @@ public class IntegrationTests {
         StorageManager storageManager = new StorageManager("StorageManager", logger, Arrays.asList(b1));
         RobotManager robotManager = new RobotManager("RobotManager", logger);
         Robot robot = new Robot("R1", "Robot", logger);
-        robot.setBattery(100);
         robotManager.addRobot(robot);
 
         File snapshotDir = Files.createTempDirectory("tasksnapshots").toFile();

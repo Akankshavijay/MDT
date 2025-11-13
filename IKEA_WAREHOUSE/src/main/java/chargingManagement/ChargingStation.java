@@ -73,6 +73,7 @@ public class ChargingStation implements Runnable {
 
     public void stop() {
         running = false;
+        logger.log(systemName, "Station thread stopped " + this.id);
     }
 
     @Override
