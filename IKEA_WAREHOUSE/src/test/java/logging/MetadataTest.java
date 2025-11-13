@@ -1,21 +1,33 @@
 package test.java.logging;
 
+import main.java.logging.LogManager;
+import main.java.logging.LogMetadataManager;
 
 import java.io.File;
 
-import main.java.logging.LogMetadataManager;
-
 public class MetadataTest {
-    public static void main(String[] args) {
-        LogMetadataManager manager = new LogMetadataManager();
+	public static void main(String[] args) {
 
-        File logFile = new File("logs/StorageSystem/test_log.log");
+		LogManager logger = new LogManager();
 
-        manager.registerLog(logFile, "StorageSystem");
-        manager.moveLog("test_log.log", "RobotSystem");
-        manager.archiveSubsystem("RobotSystem");
-        manager.deleteLog("test_log.log");
+		LogMetadataManager manager = new LogMetadataManager(logger);
 
-        manager.listAll();
-    }
+		File logFile = new File("target/logs/StorageSystem/test_log.log");
+
+		logFile.getParentFile().mkdirs();
+
+		try {
+			if (!logFile.exists())
+				logFile.createNewFile();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		// 4️⃣ Run operations
+		manager.registerLog(logFile, "StorageSystem");
+		manager.moveLog("test_log.log", "RobotSystem");
+		manager.archiveSubsystem("RobotSystem");
+		manager.deleteLog("test_log.log");
+
+	}
 }
