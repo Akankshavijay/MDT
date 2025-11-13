@@ -23,7 +23,7 @@ public abstract class Manager implements Runnable {
 
     public final synchronized void stop() {
         running = false;
-        logger.log(systemName, " got stop signal");
+        logger.log(systemName, systemName + " got stop signal");
         if (thread != null) thread.interrupt();
     }
 
@@ -36,17 +36,17 @@ public abstract class Manager implements Runnable {
     }
 
     protected void onInitialize() { 
-    	logger.log(systemName, " initialized");
+    	logger.log(systemName, systemName + " initialized");
     }
     
     protected void onStart() {}
     
     protected void onStop()  { 
-    	logger.log(systemName, " stopped");
+    	logger.log(systemName, systemName + " stopped");
     }
     
     protected void onError(Throwable t) { 
-    	logger.log(systemName, " error: " + t.getMessage());
+    	logger.log(systemName, systemName + " error: " + t.getMessage());
     }
     
     @Override
