@@ -38,7 +38,7 @@ public class RobotManager extends Manager {
 
     public void addRobot(Robot robot) {
         robots.put(robot.getId(), robot);
-        logger.log(systemName, "Added robot" + robot.getId());
+        logger.log(systemName, "Added robot " + robot.getId());
     }
     
     public Optional<Robot> getRobot(String id) {
@@ -94,7 +94,7 @@ public class RobotManager extends Manager {
     protected void onStart() {
         for (Robot r : robots.values()) {
             new Thread(r, "Robot-" + r.getId()).start();
-            logger.log(systemName, "Started robot thread" + r.getId());
+            logger.log(systemName, "Started robot thread " + r.getId());
         }
     }
     
