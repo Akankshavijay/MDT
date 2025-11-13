@@ -100,26 +100,35 @@ public class TaskManager extends Manager {
     // RobotManager callback
     public void onRobotTaskCompleted(String robotTaskId, boolean success) {
         WarehouseTask wt = inFlight.remove(robotTaskId);
-        
+
         if (wt == null) {
-//            logger.log(systemName, "Orphan robot task completed: " + robotTaskId);
             throw new TaskManagerException("Unknown robot task id: " + robotTaskId);
         }
-        
+
         try {
             if (success) {
-            	String warehouseTaskId = wt.getId();
-            	
+                String warehouseTaskId = wt.getId();
+
                 if (wt.getType() == TaskType.STORE) {
-                    storageManager.applyAfterRobot(TaskType.STORE, wt.getBinId(), warehouseTaskId, 
-                    		new Item(wt.getItemId(), wt.getItemType()));
+                    storageManager.applyAfterRobot(
+                            TaskType.STORE,
+                            wt.getBinId(),
+                            warehouseTaskId,
+                            new Item(wt.getItemId(), wt.getItemType())
+                    );
                 } else if (wt.getType() == TaskType.RETRIEVE) {
-                    storageManager.applyAfterRobot(TaskType.RETRIEVE, wt.getBinId(), warehouseTaskId, 
-                    		null);
+                    storageManager.applyAfterRobot(
+                            TaskType.RETRIEVE,
+                            wt.getBinId(),
+                            warehouseTaskId,
+                            null
+                    );
                 }
+
                 wt.setState(TaskState.DONE);
                 logger.log(systemName, "Warehouse task completed: " + wt.getId());
             } else {
+                // Release reservation for STORE
                 if (wt.getType() == TaskType.STORE && wt.getBinId() != null) {
                     storageManager.releaseReservation(wt.getBinId(), wt.getId());
                 }
@@ -127,10 +136,21 @@ public class TaskManager extends Manager {
                 logger.log(systemName, "Warehouse task failed: " + wt.getId());
             }
         } catch (StorageException e) {
+            // ERROR and release reservation
+            if (wt.getType() == TaskType.STORE && wt.getBinId() != null) {
+                try {
+                    storageManager.releaseReservation(wt.getBinId(), wt.getId());
+                } catch (StorageException ignore) {
+                    logger.log(systemName,
+                            "Failed to release reservation for task " + wt.getId() + ": " + ignore.getMessage());
+                }
+            }
             wt.setState(TaskState.ERROR);
-            logger.log(systemName, "Storage update failed for task " + wt.getId() + ": " + e.getMessage());
+            logger.log(systemName,
+                    "Storage update failed for task " + wt.getId() + ": " + e.getMessage());
         }
     }
+
     
 //    public void startTask(String taskId) {
 //        WarehouseTask t = findTask(taskId);
@@ -280,40 +300,86 @@ public class TaskManager extends Manager {
         try {
             switch (next.getType()) {
                 case STORE: {
-                	Optional<Bin> reserved = storageManager.findAndReserveBinForStore(next.getBinId(), next.getId());
-                    if (!reserved.isPresent()) return; // nothing to do now
+                    // Reserve bin for this warehouse task
+                    Optional<Bin> reserved = storageManager.findAndReserveBinForStore(next.getBinId(), next.getId());
+                    if (!reserved.isPresent()) {
+                    	// Nothing to do
+                        return;
+                    }
                     Bin target = reserved.get();
                     next.setBinId(target.getId());
-                    
+
                     RobotTask rt = TaskAdapter.toRobotTask(next, target);
-                    boolean assigned = robotManager.enqueueRobotTask(rt, next);
-                    if (assigned) {
-                        next.setState(TaskState.IN_PROGRESS);
-                        inFlight.put(rt.getId(), next);
-                    } else {
-                        storageManager.releaseReservation(target.getId(), next.getId());
+
+                    // Mark IN_PROGRESS and register in inFlight before giving it to RobotManager
+                    next.setState(TaskState.IN_PROGRESS);
+                    inFlight.put(rt.getId(), next);
+
+                    boolean assigned = true;
+                    try {
+                        assigned = robotManager.enqueueRobotTask(rt, next);
+                    } catch (RobotManagerException e) {
+                        // Clean up reservation and inFlight
+                        inFlight.remove(rt.getId());
+                        try {
+                            storageManager.releaseReservation(target.getId(), next.getId());
+                        } catch (StorageException se) {
+                            logger.log(systemName,
+                                    "Failed to release reservation for bin " + target.getId() + ": " + se.getMessage());
+                        }
+                        throw e;
                     }
+
+                    if (!assigned) {
+                        // Clean up
+                        inFlight.remove(rt.getId());
+                        try {
+                            storageManager.releaseReservation(target.getId(), next.getId());
+                        } catch (StorageException se) {
+                            logger.log(systemName,
+                                    "Failed to release reservation for bin " + target.getId() + ": " + se.getMessage());
+                        }
+                        next.setState(TaskState.ERROR);
+                    }
+
                     break;
                 }
+
                 case RETRIEVE: {
                     Optional<Bin> occ = storageManager.findOccupiedBinForRetrieve(next.getBinId());
-                    if (!occ.isPresent()) return;
+                    if (!occ.isPresent()) {
+                        // Nothing to do
+                        return;
+                    }
                     Bin target = occ.get();
+
                     RobotTask rt = TaskAdapter.toRobotTask(next, target);
-                    boolean assigned = robotManager.enqueueRobotTask(rt, next);
-                    if (assigned) {
-                        next.setState(TaskState.IN_PROGRESS);
-                        inFlight.put(rt.getId(), next);
+
+                    // Mark IN_PROGRESS and register in inFlight before giving it to RobotManager
+                    next.setState(TaskState.IN_PROGRESS);
+                    inFlight.put(rt.getId(), next);
+
+                    boolean assigned = true;
+                    try {
+                        assigned = robotManager.enqueueRobotTask(rt, next);
+                    } catch (RobotManagerException e) {
+                        inFlight.remove(rt.getId());
+                        throw e;
+                    }
+
+                    if (!assigned) {
+                        inFlight.remove(rt.getId());
+                        next.setState(TaskState.ERROR);
                     }
                     break;
                 }
+
                 default:
                     throw new TaskManagerException("Unsupported task type: " + next.getType());
             }
-        } catch (TaskManagerException | RobotManagerException | StorageException e) {
+        } catch (TaskManagerException | RobotManagerException e) {
             next.setState(TaskState.ERROR);
             logger.log(systemName, "Failed to run task " + next.getId() + ": " + e.getMessage());
         }
     }
 }
-
