@@ -17,122 +17,90 @@ import java.util.Arrays;
 
 public class Simulation {
 
-    public static void main(String[] args) throws Exception {
-        LogManager logger = new LogManager();
-        logger.log("Simulation", "Bootstrapping simulation...");
+	public static void main(String[] args) throws Exception {
+		LogManager logger = new LogManager();
+		logger.log("Simulation", "Bootstrapping simulation...");
 
-        Bin b1 = new Bin("B1", 1, 1);
-        Bin b2 = new Bin("B2", 2, 1);
+		Bin b1 = new Bin("B1", 1, 1);
+		Bin b2 = new Bin("B2", 2, 1);
 
-        StorageManager storageManager = new StorageManager(
-                "StorageManager",
-                logger,
-                Arrays.asList(b1, b2)
-        );
+		StorageManager storageManager = new StorageManager("StorageManager", logger, Arrays.asList(b1, b2));
 
-        ChargingManager chargingManager = new ChargingManager(
-                "ChargingManager",
-                logger
-        );
+		ChargingManager chargingManager = new ChargingManager("ChargingManager", logger);
 
-        ChargingStation station1 = new ChargingStation(
-                "CS1",
-                0,
-                0,
-                "ChargingManager",
-                logger
-        );
-        chargingManager.addStation(station1);
+		ChargingStation station1 = new ChargingStation("CS1", 0, 0, "ChargingManager", logger);
+		chargingManager.addStation(station1);
 
-        RobotManager robotManager = new RobotManager(
-                "RobotManager",
-                logger
-        );
-        robotManager.setChargingManager(chargingManager);
+		RobotManager robotManager = new RobotManager("RobotManager", logger);
+		robotManager.setChargingManager(chargingManager);
 
-        Robot r1 = new Robot("R1", 0, 0, 100, "RobotManager", logger);
-        Robot r2 = new Robot("R2", 0, 0, 30,  "RobotManager", logger);
+		Robot r1 = new Robot("R1", 0, 0, 100, "RobotManager", logger);
+		Robot r2 = new Robot("R2", 0, 0, 30, "RobotManager", logger);
 
-        robotManager.addRobot(r1);
-        robotManager.addRobot(r2);
+		robotManager.addRobot(r1);
+		robotManager.addRobot(r2);
 
-        File snapshotDir = new File("target/tasksnapshots");
-        if (!snapshotDir.exists()) {
-            snapshotDir.mkdirs();
-        }
+		File snapshotDir = new File("target/tasksnapshots");
+		if (!snapshotDir.exists()) {
+			snapshotDir.mkdirs();
+		}
 
-        TaskManager taskManager = new TaskManager(
-                "TaskManager",
-                logger,
-                storageManager,
-                robotManager,
-                snapshotDir
-        );
+		TaskManager taskManager = new TaskManager("TaskManager", logger, storageManager, robotManager, snapshotDir);
 
-        WarehouseTask tStore1 = new WarehouseTask(
-                "TS1",
-                TaskType.STORE,
-                "B1",
-                "I1",
-                "BOX"
-        );
+		WarehouseTask tStore1 = new WarehouseTask("TS1", TaskType.STORE, "B1", "I1", "BOX");
 
-        WarehouseTask tStore2 = new WarehouseTask(
-                "TS2",
-                TaskType.STORE,
-                null,
-                "I2",
-                "BOX"
-        );
+		WarehouseTask tStore2 = new WarehouseTask("TS2", TaskType.STORE, null, "I2", "BOX");
 
-        try {
-            taskManager.submit(tStore1);
-            taskManager.submit(tStore2);
-        } catch (Exception e) {
-            logger.log("Simulation", "Failed to submit initial tasks: " + e.getMessage());
-        }
+		try {
+			taskManager.submit(tStore1);
+			taskManager.submit(tStore2);
+		} catch (Exception e) {
+			logger.log("Simulation", "Failed to submit initial tasks: " + e.getMessage());
+		}
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.log("Simulation", "Shutdown requested, stopping managers and workers...");
-            try {
-                taskManager.stop();
-                robotManager.stop();
-                chargingManager.stop();
-                storageManager.stop();
-            } catch (Throwable t) {
-                logger.log("Simulation", "Error during manager shutdown: " + t.getMessage());
-            }
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			logger.log("Simulation", "Shutdown requested, stopping managers and workers...");
+			try {
+				taskManager.stop();
+				robotManager.stop();
+				chargingManager.stop();
+				storageManager.stop();
+			} catch (Throwable t) {
+				logger.log("Simulation", "Error during manager shutdown: " + t.getMessage());
+			}
 
-            try {
-                station1.stop();
-                r1.stop();
-                r2.stop();
-            } catch (Throwable t) {
-                logger.log("Simulation", "Error during worker shutdown: " + t.getMessage());
-            }
+			try {
+				station1.stop();
+				r1.stop();
+				r2.stop();
+			} catch (Throwable t) {
+				logger.log("Simulation", "Error during worker shutdown: " + t.getMessage());
+			}
 
-            logger.log("Simulation", "Shutdown sequence finished.");
-        }, "Simulation-ShutdownHook"));
+			logger.log("Simulation", "Shutdown sequence finished.");
+		}, "Simulation-ShutdownHook"));
 
-        Dashboard.launchDashboard(robotManager, storageManager, taskManager, logger);
-        logger.log("Simulation", "Dashboard started.");
-        
-        logger.log("Simulation", "Starting managers...");
-        storageManager.start();
-        chargingManager.start();
-        robotManager.start();
-        taskManager.start();        
-        logger.log("Simulation", "Simulation started. Press Ctrl+C to exit.");
-        
+		Thread dashboardThread = new Thread(() -> {
+			Dashboard.launchDashboard(robotManager, storageManager, taskManager, logger);
+		}, "Dashboard-Thread");
 
-        try {
-            while (true) {
-                Thread.sleep(1000L);
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+		dashboardThread.start();
 
-        logger.log("Simulation", "Main thread exiting.");
-    }
+		logger.log("Simulation", "Starting managers...");
+		storageManager.start();
+		chargingManager.start();
+		robotManager.start();
+		taskManager.start();
+		logger.log("Simulation", "Simulation started. Press Ctrl+C to exit.");
+
+		try {
+			while (true) {
+				Thread.sleep(1000L);
+			}
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+
+		logger.log("Simulation", "Main thread exiting.");
+	}
 }

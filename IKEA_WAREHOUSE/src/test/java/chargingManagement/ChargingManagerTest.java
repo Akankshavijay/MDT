@@ -10,73 +10,74 @@ import main.java.robotManagement.Robot;
 import static org.junit.Assert.*;
 
 public class ChargingManagerTest {
-    private static class TestChargingManager extends ChargingManager {
-        public TestChargingManager(String systemName, LogManager logger) {
-            super(systemName, logger);
-        }
-        public void loopOncePublic() {
-            super.loopOnce();
-        }
-    }
+	private static class TestChargingManager extends ChargingManager {
+		public TestChargingManager(String systemName, LogManager logger) {
+			super(systemName, logger);
+		}
 
-    @Test
-    public void robotFromQueueIsAssignedToReadyStation() {
-        LogManager logger = new LogManager();
-        TestChargingManager cm = new TestChargingManager("ChargingSysUnit", logger);
+		public void loopOncePublic() {
+			super.loopOnce();
+		}
+	}
 
-        ChargingStation s1 = new ChargingStation("S1", 0, 0, "ChargingSysUnit", logger);
-        cm.addStation(s1);
+	@Test
+	public void robotFromQueueIsAssignedToReadyStation() {
+		LogManager logger = new LogManager();
+		TestChargingManager cm = new TestChargingManager("ChargingSysUnit", logger);
 
-        Robot r1 = new Robot("R1", "RobotSysUnit", logger);
-        cm.addRobotToQueue(r1);
+		ChargingStation s1 = new ChargingStation("S1", 0, 0, "ChargingSysUnit", logger);
+		cm.addStation(s1);
 
-        assertEquals(ChargingStation.Status.READY, s1.getStatus());
-        assertNull(s1.getCurrentRobot());
-        assertTrue(cm.isQueued(r1));
+		Robot r1 = new Robot("R1", "RobotSysUnit", logger);
+		cm.addRobotToQueue(r1);
 
-        cm.loopOncePublic();
+		assertEquals(ChargingStation.Status.READY, s1.getStatus());
+		assertNull(s1.getCurrentRobot());
+		assertTrue(cm.isQueued(r1));
 
-        assertSame("Robot should be assigned to station", r1, s1.getCurrentRobot());
-        assertEquals("Station must be in CHARGING state after assignment",
-                ChargingStation.Status.CHARGING, s1.getStatus());
-        assertFalse("Robot should be removed from queue after assignment", cm.isQueued(r1));
-    }
+		cm.loopOncePublic();
 
-    @Test
-    public void stationWithErrorDoesNotGetAssignedRobot() {
-        LogManager logger = new LogManager();
-        TestChargingManager cm = new TestChargingManager("ChargingSysUnit2", logger);
+		assertSame("Robot should be assigned to station", r1, s1.getCurrentRobot());
+		assertEquals("Station must be in CHARGING state after assignment", ChargingStation.Status.CHARGING,
+				s1.getStatus());
+		assertFalse("Robot should be removed from queue after assignment", cm.isQueued(r1));
+	}
 
-        ChargingStation s1 = new ChargingStation("S1", 0, 0, "ChargingSysUnit2", logger);
-        cm.addStation(s1);
+	@Test
+	public void stationWithErrorDoesNotGetAssignedRobot() {
+		LogManager logger = new LogManager();
+		TestChargingManager cm = new TestChargingManager("ChargingSysUnit2", logger);
 
-        Robot r1 = new Robot("R1", "RobotSysUnit2", logger);
-        cm.addRobotToQueue(r1);
+		ChargingStation s1 = new ChargingStation("S1", 0, 0, "ChargingSysUnit2", logger);
+		cm.addStation(s1);
 
-        s1.setStatus(ChargingStation.Status.ERROR);
+		Robot r1 = new Robot("R1", "RobotSysUnit2", logger);
+		cm.addRobotToQueue(r1);
 
-        cm.loopOncePublic();
+		s1.setStatus(ChargingStation.Status.ERROR);
 
-        assertTrue("Robot should remain queued if station is ERROR", cm.isQueued(r1));
-        assertNull("Station should not have robot assigned when ERROR", s1.getCurrentRobot());
-        assertEquals(ChargingStation.Status.ERROR, s1.getStatus());
-    }
+		cm.loopOncePublic();
 
-    @Test
-    public void queuePositionReflectsOrder() {
-        LogManager logger = new LogManager();
-        TestChargingManager cm = new TestChargingManager("ChargingSysUnit3", logger);
+		assertTrue("Robot should remain queued if station is ERROR", cm.isQueued(r1));
+		assertNull("Station should not have robot assigned when ERROR", s1.getCurrentRobot());
+		assertEquals(ChargingStation.Status.ERROR, s1.getStatus());
+	}
 
-        Robot r1 = new Robot("R1", "RobotSysUnit3", logger);
-        Robot r2 = new Robot("R2", "RobotSysUnit3", logger);
-        Robot r3 = new Robot("R3", "RobotSysUnit3", logger);
+	@Test
+	public void queuePositionReflectsOrder() {
+		LogManager logger = new LogManager();
+		TestChargingManager cm = new TestChargingManager("ChargingSysUnit3", logger);
 
-        cm.addRobotToQueue(r1);
-        cm.addRobotToQueue(r2);
-        cm.addRobotToQueue(r3);
+		Robot r1 = new Robot("R1", "RobotSysUnit3", logger);
+		Robot r2 = new Robot("R2", "RobotSysUnit3", logger);
+		Robot r3 = new Robot("R3", "RobotSysUnit3", logger);
 
-        assertEquals("r1 must be first in queue", 0, cm.queuePosition(r1));
-        assertEquals("r2 must be second in queue", 1, cm.queuePosition(r2));
-        assertEquals("r3 must be third in queue", 2, cm.queuePosition(r3));
-    }
+		cm.addRobotToQueue(r1);
+		cm.addRobotToQueue(r2);
+		cm.addRobotToQueue(r3);
+
+		assertEquals("r1 must be first in queue", 0, cm.queuePosition(r1));
+		assertEquals("r2 must be second in queue", 1, cm.queuePosition(r2));
+		assertEquals("r3 must be third in queue", 2, cm.queuePosition(r3));
+	}
 }

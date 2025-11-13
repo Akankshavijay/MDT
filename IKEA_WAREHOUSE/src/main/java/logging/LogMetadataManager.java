@@ -9,142 +9,161 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 /**
- * LogMetadataManager
- * -------------------
- * Manages metadata and lifecycle for all subsystem log files.
- * Enables a UI or CLI to register, view, move, delete, or archive logs dynamically.
+ * LogMetadataManager ------------------- Works with the same log directory used
+ * by LogManager.
  */
 public class LogMetadataManager {
 
-    private final File baseDir = new File("logs");
-    private final File archiveDir = new File("logs/archive");
-    private final Map<String, String> logRegistry = new HashMap<>();
+	private final File baseDir;
+	private final File archiveDir;
 
-    public LogMetadataManager() {
-        if (!baseDir.exists()) baseDir.mkdirs();
-        if (!archiveDir.exists()) archiveDir.mkdirs();
-        autoRegisterExistingLogs();
-    }
+	/** filename → subsystem directory */
+	private final Map<String, String> logRegistry = new HashMap<>();
 
-    /** Automatically scan and register existing logs in /logs directory */
-    private void autoRegisterExistingLogs() {
-        File[] subsystemDirs = baseDir.listFiles(File::isDirectory);
-        if (subsystemDirs == null) return;
+	/**
+	 * Instead of hardcoding "logs/", this version uses the LogManager's directory.
+	 */
+	public LogMetadataManager(LogManager logManager) {
 
-        for (File subsystemDir : subsystemDirs) {
-            if (subsystemDir.getName().equals("archive")) continue; // skip archive folder
-            for (File logFile : Objects.requireNonNull(subsystemDir.listFiles())) {
-                String name = logFile.getName();
-                if (name.endsWith(".log") || name.endsWith(".json")) {
-                    logRegistry.put(name, subsystemDir.getName());
-                }
-            }
-        }
-    }
+		// LogManager stores logs under: target/logs
+		this.baseDir = new File("target/logs");
+		this.archiveDir = new File(baseDir, "archive");
 
-    /** Register a specific log file in metadata */
-    public void registerLog(File logFile, String subsystem) {
-        if (logFile.exists()) {
-            logRegistry.put(logFile.getName(), subsystem);
-            System.out.println("Registered: " + logFile.getName() + " under subsystem " + subsystem);
-        }
-    }
+		if (!baseDir.exists())
+			baseDir.mkdirs();
+		if (!archiveDir.exists())
+			archiveDir.mkdirs();
 
-    /** Move log file to another subsystem folder */
-    public void moveLog(String fileName, String newSubsystem) {
-        try {
-            String oldSubsystem = logRegistry.get(fileName);
-            if (oldSubsystem == null) {
-                System.out.println("Log not found in registry: " + fileName);
-                return;
-            }
+		autoRegisterExistingLogs();
+	}
 
-            File oldFile = new File(baseDir + "/" + oldSubsystem + "/" + fileName);
-            File newDir = new File(baseDir + "/" + newSubsystem);
-            if (!newDir.exists()) newDir.mkdirs();
+	/** Automatically scan and register existing logs in /target/logs */
+	private void autoRegisterExistingLogs() {
+		File[] subsystemDirs = baseDir.listFiles(File::isDirectory);
+		if (subsystemDirs == null)
+			return;
 
-            File newFile = new File(newDir, fileName);
-            Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		for (File subsystemDir : subsystemDirs) {
+			if (subsystemDir.getName().equals("archive"))
+				continue;
 
-            logRegistry.put(fileName, newSubsystem);
-            System.out.println("Moved log file: " + fileName + " → " + newSubsystem);
-        } catch (IOException e) {
-            System.out.println("Error moving log: " + e.getMessage());
-        }
-    }
+			File[] logFiles = subsystemDir.listFiles();
+			if (logFiles == null)
+				continue;
 
-    /** Delete a log file */
-    public void deleteLog(String fileName) {
-        String subsystem = logRegistry.get(fileName);
-        if (subsystem == null) {
-            System.out.println("Log not found in registry: " + fileName);
-            return;
-        }
+			for (File logFile : logFiles) {
+				String name = logFile.getName();
+				if (name.endsWith(".log") || name.endsWith(".json")) {
+					logRegistry.put(name, subsystemDir.getName());
+				}
+			}
+		}
+	}
 
-        File logFile = new File(baseDir + "/" + subsystem + "/" + fileName);
-        if (logFile.exists() && logFile.delete()) {
-            logRegistry.remove(fileName);
-            System.out.println("Deleted log file: " + fileName);
-        } else {
-            System.out.println("Unable to delete: " + fileName);
-        }
-    }
+	/** Register new log file */
+	public void registerLog(File logFile, String subsystem) {
+		if (logFile.exists()) {
+			logRegistry.put(logFile.getName(), subsystem);
+			System.out.println("Registered: " + logFile.getName() + " under subsystem " + subsystem);
+		}
+	}
 
-    /** Archive all logs for a specific subsystem into ZIP under /logs/archive/ */
-    public void archiveSubsystem(String subsystem) {
-        File subsystemDir = new File(baseDir, subsystem);
-        if (!subsystemDir.exists() || subsystemDir.listFiles() == null) {
-            System.out.println("No logs found to archive for subsystem: " + subsystem);
-            return;
-        }
+	/** Move log file to another subsystem folder */
+	public void moveLog(String fileName, String newSubsystem) {
+		try {
+			String oldSubsystem = logRegistry.get(fileName);
+			if (oldSubsystem == null) {
+				System.out.println("Log not found in registry: " + fileName);
+				return;
+			}
 
-        String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
-        File archiveFile = new File(archiveDir, subsystem + "_" + timestamp + ".zip");
+			File oldFile = new File(baseDir + "/" + oldSubsystem + "/" + fileName);
+			File newDir = new File(baseDir + "/" + newSubsystem);
 
-        try (FileOutputStream fos = new FileOutputStream(archiveFile);
-             ZipOutputStream zos = new ZipOutputStream(fos)) {
+			if (!newDir.exists())
+				newDir.mkdirs();
 
-            for (File file : Objects.requireNonNull(subsystemDir.listFiles())) {
-                try (FileInputStream fis = new FileInputStream(file)) {
-                    zos.putNextEntry(new ZipEntry(file.getName()));
-                    fis.transferTo(zos);
-                    zos.closeEntry();
-                }
-            }
-            System.out.println("✅ Archived subsystem: " + subsystem + " → " + archiveFile.getName());
-        } catch (IOException e) {
-            System.out.println("Error during archive: " + e.getMessage());
-        }
-    }
+			File newFile = new File(newDir, fileName);
+			Files.move(oldFile.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
-    /** List all registered logs and their subsystem ownership */
-    public void listAll() {
-        System.out.println("\n=== Registered Log Metadata ===");
-        if (logRegistry.isEmpty()) {
-            System.out.println("No logs registered yet.");
-        } else {
-            logRegistry.forEach((file, subsystem) ->
-                    System.out.println(file + " → " + subsystem));
-        }
-    }
+			logRegistry.put(fileName, newSubsystem);
 
-    /** List logs for a specific subsystem */
-    public void listBySubsystem(String subsystem) {
-        System.out.println("\n=== Logs under subsystem: " + subsystem + " ===");
-        logRegistry.entrySet().stream()
-                .filter(e -> e.getValue().equals(subsystem))
-                .forEach(e -> System.out.println(e.getKey()));
-    }
+			System.out.println("Moved: " + fileName + " → " + newSubsystem);
 
-    /** Get all subsystems with logs */
-    public Set<String> listSubsystems() {
-        return new HashSet<>(logRegistry.values());
-    }
+		} catch (IOException e) {
+			System.out.println("Error moving log: " + e.getMessage());
+		}
+	}
 
-    /** Refresh registry by rescanning log directories */
-    public void refreshRegistry() {
-        logRegistry.clear();
-        autoRegisterExistingLogs();
-        System.out.println("Refreshed log registry. Total logs: " + logRegistry.size());
-    }
+	/** Delete a log file */
+	public void deleteLog(String fileName) {
+		String subsystem = logRegistry.get(fileName);
+		if (subsystem == null) {
+			System.out.println("Log not found: " + fileName);
+			return;
+		}
+
+		File logFile = new File(baseDir + "/" + subsystem + "/" + fileName);
+
+		if (logFile.exists() && logFile.delete()) {
+			logRegistry.remove(fileName);
+			System.out.println("Deleted: " + fileName);
+		} else {
+			System.out.println("Unable to delete: " + fileName);
+		}
+	}
+
+	/** Archive all logs for a given subsystem */
+	public void archiveSubsystem(String subsystem) {
+		File subsystemDir = new File(baseDir, subsystem);
+		File[] files = subsystemDir.listFiles();
+
+		if (files == null || files.length == 0) {
+			System.out.println("No logs found to archive for subsystem: " + subsystem);
+			return;
+		}
+
+		String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss"));
+		File archiveFile = new File(archiveDir, subsystem + "_" + timestamp + ".zip");
+
+		try (FileOutputStream fos = new FileOutputStream(archiveFile); ZipOutputStream zos = new ZipOutputStream(fos)) {
+
+			for (File f : files) {
+				try (FileInputStream fis = new FileInputStream(f)) {
+					zos.putNextEntry(new ZipEntry(f.getName()));
+					fis.transferTo(zos);
+					zos.closeEntry();
+				}
+			}
+
+			System.out.println("Archived subsystem logs → " + archiveFile.getAbsolutePath());
+
+		} catch (IOException e) {
+			System.out.println("Archive error: " + e.getMessage());
+		}
+	}
+
+	/** Return list of subsystems */
+	public Set<String> listSubsystems() {
+		return new HashSet<>(logRegistry.values());
+	}
+
+	/** Refresh map by rescanning file system */
+	public void refreshRegistry() {
+		logRegistry.clear();
+		autoRegisterExistingLogs();
+		System.out.println("Registry refreshed. Total logs: " + logRegistry.size());
+	}
+
+	/** Safe log list retrieval for UI */
+	public List<String> listLogsOfSubsystem(String subsystem) {
+		List<String> result = new ArrayList<>();
+
+		for (var e : logRegistry.entrySet()) {
+			if (e.getValue().equals(subsystem)) {
+				result.add(e.getKey());
+			}
+		}
+		return result;
+	}
 }
