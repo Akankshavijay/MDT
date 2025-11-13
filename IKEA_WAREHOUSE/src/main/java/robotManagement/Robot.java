@@ -18,6 +18,12 @@ public class Robot implements Runnable {
     private final int batteryDrainPerStep = 1;
     private final int stepTime = 50;
 
+    public Robot(String id, String systemName, LogManager logger) {
+        this.id = id;
+        this.systemName = systemName;
+        this.logger = logger;
+    }
+    
     public Robot(String id, int startX, int startY, int initialBattery, String systemName, LogManager logger) {
         this.id = id;
         this.x = startX;
@@ -32,17 +38,11 @@ public class Robot implements Runnable {
         return id;
     }
 
-    public int getBattery() {
-        return battery;
-    }
+    public int getBattery() { return battery; }
+    public void setBattery(int battery) { this.battery = Math.max(0, Math.min(100, battery)); }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
+    public int getX() { return x; }
+    public int getY() { return y; }
 
     public Status getStatus() {
         return status;
@@ -147,13 +147,13 @@ public class Robot implements Runnable {
                 case STORE:
                     moveTo(task.getTargetX(), task.getTargetY());
                     drainBattery(2);
-                    sleepMinutes(1);
+                    sleepMillis(5000);
                     currentTask = RobotTask.idle();
                     break;
                 case RETRIEVE:
                     moveTo(task.getTargetX(), task.getTargetY());
                     drainBattery(2);
-                    sleepMinutes(1);
+                    sleepMillis(5000);
                     currentTask = RobotTask.idle();
                     break;
                 case CHARGE:

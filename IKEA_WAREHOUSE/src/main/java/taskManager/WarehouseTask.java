@@ -7,31 +7,32 @@ import java.time.LocalDateTime;
 public class WarehouseTask implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    // store / retrieve
-    private final String action;
     private final String id;
-    private final String binId;
+    private final TaskType type;
+    private String binId;
     private final String itemId;
     private final String itemType;
 
-    private TaskState state;
-    private final LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private TaskState state = TaskState.STANDING_BY;
+    private final LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
-    public WarehouseTask(String id, String action, String binId, String itemId, String itemType) {
+    public WarehouseTask(String id, TaskType type, String binId, String itemId, String itemType) {
         this.id = id;
-        this.action = action;
+        this.type = type;
         this.binId = binId;
         this.itemId = itemId;
         this.itemType = itemType;
-        this.state = TaskState.STANDING_BY;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
     }
 
     public String getId() { return id; }
-    public String getAction() { return action; }
+    public TaskType getType() { return type; }
+    
     public String getBinId() { return binId; }
+    public void setBinId(String binId) { 
+    	this.binId = binId; 
+    	touch(); 
+    }
     public String getItemId() { return itemId; }
     public String getItemType() { return itemType; }
 
@@ -41,12 +42,14 @@ public class WarehouseTask implements Serializable {
 
     public void setState(TaskState newState) {
         this.state = newState;
-        this.updatedAt = LocalDateTime.now();
+        touch();
     }
+    
+    private void touch() { this.updatedAt = java.time.LocalDateTime.now(); }
 
     @Override
     public String toString() {
-        return "Task[" + id + "] " + action.toUpperCase() + " bin=" + binId +
+        return "WarehouseTask[" + id + "] " + type + " bin=" + binId +
                 " item=" + itemId + " (" + itemType + ") state=" + state;
     }
 }

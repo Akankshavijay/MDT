@@ -2,195 +2,209 @@ package test.java.taskManager;
 
 import org.junit.jupiter.api.*;
 
-import main.java.communication.WarehouseMessage;
+import main.java.exceptionHandler.RobotManagerException;
+import main.java.exceptionHandler.StorageException;
 import main.java.exceptionHandler.TaskManagerException;
-import main.java.exceptionHandler.WarehouseException;
 import main.java.logging.LogManager;
+import main.java.robotManagement.RobotManager;
+import main.java.robotManagement.RobotTask;
 import main.java.storageManagement.Bin;
 import main.java.storageManagement.Item;
 import main.java.storageManagement.StorageManager;
-import main.java.taskManager.TaskManager;
-import main.java.taskManager.TaskState;
-import main.java.taskManager.WarehouseTask;
-import main.java.warehouseMap.WarehouseMap;
+import main.java.taskManager.*;
 
-import java.io.*;
+import java.io.File;
 import java.nio.file.Files;
-import java.util.List;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TaskManagerTest {
 
+    private LogManager logger;
     private StorageManager storageManager;
+    private MockRobotManager robotManager;
     private TaskManager taskManager;
-
-    private ByteArrayOutputStream storageByteOut;
-    private ObjectOutputStream storageObjOut;
-
-    private ByteArrayOutputStream tmByteOut;
-    private StringWriter tmCharOut;
-
     private File snapshotDir;
+
+    private Bin b1, b2;
 
     @BeforeEach
     public void setUp() throws Exception {
-        // temp directory for snapshots
+        logger = new LogManager();
         snapshotDir = Files.createTempDirectory("tasksnapshots").toFile();
 
-        LogManager logManager = new LogManager();
-        WarehouseException handler = new WarehouseException();
-        // real map: 1 entry, 1 exit, 1 charging
-        WarehouseMap warehouseMap = new WarehouseMap(1, 1, 1);
+        // B1 free, B2 occupied with I1
+        b1 = new Bin("B1", 1, 1);
+        b2 = new Bin("B2", 2, 2);
 
-        // StorageManager needs stream to send WarehouseMessage
-        storageByteOut = new ByteArrayOutputStream();
-        storageObjOut = new ObjectOutputStream(storageByteOut);
-
-        storageManager = new StorageManager(
-                "StorageSys",
-                logManager,
-                handler,
-                warehouseMap,
-                10
-        );
-        storageManager.connectStream(storageObjOut);
-
-        // create real bins consistent with your Bin class
-        // B1 – empty
-        Bin b1 = new Bin("B1", 1);
-        // B2 – occupied with I1
-        Bin b2 = new Bin("B2", 1);
-        b2.setItem(new Item("I1", "BOX"));
-
-        storageManager.addBin(b1);
-        storageManager.addBin(b2);
-
-        // TaskManager under test
-        taskManager = new TaskManager(
-                "TaskSys",
-                storageManager,
-                logManager,
-                snapshotDir
-        );
-
-        // connect simulated data-exchange streams
-        tmByteOut = new ByteArrayOutputStream();
-        tmCharOut = new StringWriter();
-        taskManager.connectStreams(tmByteOut, tmCharOut);
+        storageManager = new StorageManager("StorageManager", logger, Arrays.asList(b1, b2));
+        storageManager.findAndReserveBinForStore("B2", "setup").orElseThrow(); // reserve B2 and commit
+        storageManager.applyAfterRobot(TaskType.STORE, "B2", "setup", new Item("I1", "BOX")); // now B2 has I1
+        
+        robotManager = new MockRobotManager(logger);
+        taskManager = new TaskManager("TaskManager", logger, storageManager, robotManager, snapshotDir);
     }
 
     @Test
-    public void addStoreTask_accepted_whenBinFree() {
-        WarehouseTask t = taskManager.addTask("T1", "store", "B1", "I100", "BOX");
+    public void addStoreTask_accepted_whenBinFree() throws Exception {
+        WarehouseTask t = new WarehouseTask("T1", TaskType.STORE, "B1", "I100", "BOX");
+        taskManager.submit(t);
         assertEquals(TaskState.STANDING_BY, t.getState());
-        assertEquals(1, taskManager.getTasks().size());
-        assertSnapshotsCreated();
+        assertEquals(1, taskManager.getTasksSnapshot().size());
     }
 
     @Test
-    public void addStoreTask_error_whenBinOccupied() {
-        // B2 in setup is occupied with I1
-        WarehouseTask t = taskManager.addTask("T2", "store", "B2", "I101", "BOX");
+    public void addStoreTask_pending_whenBinOccupied() throws Exception {
+        // B2 is occupied from setup
+        WarehouseTask t = new WarehouseTask("T2", TaskType.STORE, "B2", "I101", "BOX");
+        taskManager.submit(t);
+
+        taskManager.loopOnce(); // cannot reserve, remains pending
+        assertEquals(TaskState.STANDING_BY, t.getState());
+    }
+
+    @Test
+    public void addRetrieveTask_accepted_whenItemPresent() throws Exception {
+        WarehouseTask t = new WarehouseTask("T3", TaskType.RETRIEVE, "B2", "I1", "BOX");
+        taskManager.submit(t);
+        assertEquals(TaskState.STANDING_BY, t.getState());
+    }
+
+    @Test
+    public void startTask_store_triggersRobot_and_marksDone() throws Exception {
+        WarehouseTask t = new WarehouseTask("T4", TaskType.STORE, "B1", "I200", "BOX");
+        taskManager.submit(t);
+
+        taskManager.loopOnce(); // reserve B1, enqueue and complete via mock
+
+        assertTrue(robotManager.lastTaskWasExecuted(), "RobotManager mock must have executed a task");
+        assertEquals(TaskState.DONE, t.getState());
+        assertEquals(Bin.Status.OCCUPIED, b1.getStatus());
+        assertTrue(b1.getItem().isPresent());
+        assertEquals("I200", b1.getItem().get().getId());
+    }
+
+    @Test
+    public void startTask_robotFailure_resultsInErrorAndReservationReleased() throws Exception {
+        WarehouseTask t = new WarehouseTask("T5", TaskType.STORE, "B1", "I777", "BOX");
+        taskManager.submit(t);
+
+        robotManager.setNextSuccess(false); // cause failure
+        taskManager.loopOnce();
+
         assertEquals(TaskState.ERROR, t.getState());
-        assertEquals(1, taskManager.getTasks().size());
-        assertSnapshotsCreated();
+        assertEquals(Bin.Status.FREE, b1.getStatus(), "Reservation must be released after failure");
     }
 
     @Test
-    public void addRetrieveTask_accepted_whenItemPresent() {
-        WarehouseTask t = taskManager.addTask("T3", "retrieve", "B2", "I1", "BOX");
-        assertEquals(TaskState.STANDING_BY, t.getState());
-        assertEquals(1, taskManager.getTasks().size());
-        assertSnapshotsCreated();
-    }
+    public void retrieveTask_onSuccess_freesBin() throws Exception {
+        WarehouseTask t = new WarehouseTask("T6", TaskType.RETRIEVE, "B2", "I1", "BOX");
+        taskManager.submit(t);
 
-    @Test
-    public void startTask_store_sendsMessage_and_marksDone() throws Exception {
-        WarehouseTask t = taskManager.addTask("T4", "store", "B1", "I200", "BOX");
-        assertEquals(TaskState.STANDING_BY, t.getState());
-
-        taskManager.startTask("T4");
+        taskManager.loopOnce();
 
         assertEquals(TaskState.DONE, t.getState());
-        assertSnapshotsCreated();
-
-        // read what StorageManager sent through its ObjectOutputStream
-        ObjectInputStream ois = new ObjectInputStream(
-                new ByteArrayInputStream(storageByteOut.toByteArray())
-        );
-        Object obj = ois.readObject();
-        assertTrue(obj instanceof WarehouseMessage);
-        WarehouseMessage msg = (WarehouseMessage) obj;
-        assertEquals("store", msg.getAction());
-        assertEquals("B1", msg.getBinId());
-        assertEquals("I200", msg.getItemId());
-
-        // TaskManager also wrote to char stream
-        String charLog = tmCharOut.toString();
-        assertTrue(charLog.contains("DONE"));
+        assertEquals(Bin.Status.FREE, b2.getStatus());
+        assertTrue(b2.getItem().isEmpty());
     }
 
     @Test
-    public void moveTask_changesOrder() {
-        taskManager.addTask("T1", "store", "B1", "I10", "BOX");
-        taskManager.addTask("T2", "store", "B1", "I11", "BOX");
-        taskManager.addTask("T3", "store", "B1", "I12", "BOX");
+    public void retrieveTask_whenBinEmpty_staysPending() throws Exception {
+        WarehouseTask t = new WarehouseTask("T7", TaskType.RETRIEVE, "B1", "I999", "BOX");
+        taskManager.submit(t);
 
-        // now order is: T1, T2, T3
-        taskManager.moveTask("T1", 2);
-
-        List<WarehouseTask> tasks = taskManager.getTasks();
-        assertEquals("T2", tasks.get(0).getId());
-        assertEquals("T3", tasks.get(1).getId());
-        assertEquals("T1", tasks.get(2).getId());
-    }
-
-    @Test
-    public void cancelTask_setsCanceled() {
-        WarehouseTask t = taskManager.addTask("T5", "store", "B1", "I300", "BOX");
-        taskManager.cancelTask("T5");
-        assertEquals(TaskState.CANCELED, t.getState());
-    }
-
-    @Test
-    public void startUnknownTask_throws() {
-        assertThrows(TaskManagerException.class, () -> taskManager.startTask("NO_SUCH"));
-    }
-    
-    @Test
-    public void startTask_whenStorageManagerHasNoStream_resultsInChainedException() {
-        // arrange: task that should be valid
-        WarehouseTask t = taskManager.addTask("T_ERR", "store", "B1", "I777", "BOX");
+        taskManager.loopOnce();
         assertEquals(TaskState.STANDING_BY, t.getState());
-
-        // break StorageManager's output stream so requestStore(...) will blow up
-        storageManager.connectStream(null);
-
-        // act + assert
-        TaskManagerException ex = assertThrows(
-                TaskManagerException.class,
-                () -> taskManager.startTask("T_ERR")
-        );
-        
-        // ex.printStackTrace(); // show trace, comment after screencast
-
-        // we expect TaskManager to wrap the original RuntimeException (here: NPE)
-        assertNotNull(ex.getCause(), "Chained cause must be present");
-        assertTrue(ex.getCause() instanceof NullPointerException,
-                "Expected StorageManager to fail with NullPointerException as cause");
-
-        // and task should be marked as ERROR
-        assertEquals(TaskState.ERROR, t.getState());
     }
 
-    // ---------------------------------------------------------------------
-    // helpers
-    // ---------------------------------------------------------------------
+    @Test
+    public void multipleStoreTasks_respectReservationIsolation() throws Exception {
+        // Only B1 is free, B2 is occupied
+        WarehouseTask t1 = new WarehouseTask("T8", TaskType.STORE, null, "I1", "BOX");
+        WarehouseTask t2 = new WarehouseTask("T9", TaskType.STORE, null, "I2", "BOX");
+        taskManager.submit(t1);
+        taskManager.submit(t2);
 
-    private void assertSnapshotsCreated() {
-        File[] files = snapshotDir.listFiles();
-        assertNotNull(files);
-        assertTrue(files.length > 0, "Snapshot directory should contain at least one file");
+        taskManager.loopOnce(); // t1 completes and occupies B1
+        taskManager.loopOnce(); // t2 cannot reserve any bin
+
+        assertEquals(TaskState.DONE, t1.getState());
+        assertEquals(TaskState.STANDING_BY, t2.getState());
+        assertEquals(Bin.Status.OCCUPIED, b1.getStatus());
+    }
+
+    @Test
+    public void storageCommitFailure_marksError_andReleasesReservation() throws Exception {
+        // Use a faulty storage manager that throws on commit for STORE
+        FaultyStorageManager faulty = new FaultyStorageManager("FaultyStorage", logger, Arrays.asList(b1, b2));
+        robotManager = new MockRobotManager(logger);
+        taskManager = new TaskManager("TaskSys", logger, faulty, robotManager, snapshotDir);
+
+        WarehouseTask t = new WarehouseTask("T10", TaskType.STORE, "B1", "I555", "BOX");
+        taskManager.submit(t);
+
+        taskManager.loopOnce(); // reserve and robot success should lead to commit throws
+
+        assertEquals(TaskState.ERROR, t.getState());
+        assertEquals(Bin.Status.FREE, b1.getStatus(), "Reservation should not remain if commit fails");
+    }
+
+    @Test
+    public void onRobotTaskCompleted_withUnknownId_throws() {
+        assertThrows(TaskManagerException.class, () -> taskManager.onRobotTaskCompleted("NO_SUCH", true));
+    }
+
+    // Helpers
+    
+    private static class MockRobotManager extends RobotManager {
+        private TaskManager tm;
+        private boolean nextSuccess = true;
+        private boolean executed = false;
+
+        public MockRobotManager(LogManager logger) {
+            super("MockRobot", logger);
+        }
+
+        @Override
+        public void setTaskManager(TaskManager tm) {
+            super.setTaskManager(tm);
+            this.tm = tm;
+        }
+
+        public void setNextSuccess(boolean success) {
+            this.nextSuccess = success;
+        }
+
+        public boolean lastTaskWasExecuted() {
+            boolean out = executed;
+            executed = false;
+            return out;
+        }
+
+        @Override
+        public boolean enqueueRobotTask(RobotTask robotTask, WarehouseTask source) throws RobotManagerException {
+            executed = true;
+            if (tm == null) throw new RobotManagerException("TaskManager not set for mock");
+            tm.onRobotTaskCompleted(robotTask.getId(), nextSuccess);
+            return true;
+        }
+
+        @Override protected void loopOnce() {}
+    }
+
+    private static class FaultyStorageManager extends StorageManager {
+        public FaultyStorageManager(String name, LogManager log, java.util.Collection<Bin> bins) {
+            super(name, log, bins);
+        }
+
+        @Override
+        public void applyAfterRobot(TaskType type, String binId, String taskId, Item item) throws StorageException {
+            if (type == TaskType.STORE) {
+                // Simulate failure during commit
+                throw new StorageException("Simulated commit failure");
+            }
+            super.applyAfterRobot(type, binId, taskId, item);
+        }
     }
 }

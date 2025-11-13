@@ -1,59 +1,70 @@
 package main.java.storageManagement;
 
-import java.util.Random;
-import java.util.List;
+import java.io.Serializable;
 import java.util.Optional;
 
-public class Bin implements java.io.Serializable {
+public class Bin implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    public enum Status { FREE, RESERVED, OCCUPIED }
+    
     private final String id;
-    private boolean occupied;
-    private Item item;
     private final int x;
     private final int y;
-    private double distanceToEntry;
-    private double distanceToExit;
+    private Item item = null;
+    
+    private Status status = Status.FREE;
+    private String reservedByTaskId = null;
 
-    public Bin(String id, int capacity) {
+    public Bin(String id, int x, int y) {
         this.id = id;
-        Random rand = new Random();
-        this.x = rand.nextInt(100);
-        this.y = rand.nextInt(100);
+        this.x = x;
+        this.y = y;
     }
 
     public String getId() { return id; }
-    public boolean isOccupied() { return occupied; }
-    public Optional<Item> getItem() { return Optional.ofNullable(item); }
-    public int getX() { return x; }
-    public int getY() { return y; }
-    public double getDistanceToEntry() { return distanceToEntry; }
-    public double getDistanceToExit() { return distanceToExit; }
+    public synchronized int getX() { return x; }
+    public synchronized int getY() { return y; }
+    public synchronized Status getStatus() { return status; }
+    public synchronized boolean isOccupied() { return status == Status.OCCUPIED; }
+    public synchronized Optional<Item> getItem() { return Optional.ofNullable(item); }
 
-    public synchronized void setItem(Item item) {
-        if (item == null) {
-            this.item = null;
-            this.occupied = false;
-            return;
-        }
-        if (occupied) throw new IllegalStateException("Bin already occupied");
-        this.item = item;
-        this.occupied = true;
+    public synchronized boolean tryReserve(String taskId) {
+        if (status != Status.FREE) return false;
+        status = Status.RESERVED;
+        reservedByTaskId = taskId;
+        return true;
     }
 
-    public void computeDistances(List<int[]> entryCoords, List<int[]> exitCoords) {
-        double minEntry = Double.MAX_VALUE;
-        double minExit = Double.MAX_VALUE;
-
-        for (int[] e : entryCoords) {
-            double dist = Math.sqrt(Math.pow(x - e[0], 2) + Math.pow(y - e[1], 2));
-            if (dist < minEntry) minEntry = dist;
+    public synchronized void releaseReservation(String taskId) {
+        if (status == Status.RESERVED && taskId.equals(reservedByTaskId)) {
+            reservedByTaskId = null;
+            status = Status.FREE;
         }
-        for (int[] e : exitCoords) {
-            double dist = Math.sqrt(Math.pow(x - e[0], 2) + Math.pow(y - e[1], 2));
-            if (dist < minExit) minExit = dist;
-        }
+    }
 
-        this.distanceToEntry = minEntry;
-        this.distanceToExit = minExit;
+    public synchronized void commitStore(String taskId, Item newItem) {
+        if (status != Status.RESERVED || !taskId.equals(reservedByTaskId)) {
+            throw new IllegalStateException("Bin " + id + " not reserved by task " + taskId);
+        }
+        if (newItem == null) throw new IllegalArgumentException("Item must not be null");
+        item = newItem;
+        reservedByTaskId = null;
+        status = Status.OCCUPIED;
+    }
+
+    public synchronized Item commitRetrieve() {
+        if (status != Status.OCCUPIED) {
+            throw new IllegalStateException("Bin " + id + " is not occupied");
+        }
+        Item out = item;
+        item = null;
+        status = Status.FREE;
+        return out;
+    }
+
+    @Override
+    public String toString() {
+        return "Bin{" + id + ", occupied=" + status + ", at=(" + x + "," + y + ")}";
     }
 }
