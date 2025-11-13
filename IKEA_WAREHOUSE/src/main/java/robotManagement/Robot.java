@@ -147,13 +147,13 @@ public class Robot implements Runnable {
                 case STORE:
                     moveTo(task.getTargetX(), task.getTargetY());
                     drainBattery(2);
-                    sleepMinutes(1);
+                    sleepMillis(5000);
                     currentTask = RobotTask.idle();
                     break;
                 case RETRIEVE:
                     moveTo(task.getTargetX(), task.getTargetY());
                     drainBattery(2);
-                    sleepMinutes(1);
+                    sleepMillis(5000);
                     currentTask = RobotTask.idle();
                     break;
                 case CHARGE:

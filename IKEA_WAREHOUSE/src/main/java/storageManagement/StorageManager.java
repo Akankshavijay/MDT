@@ -78,25 +78,26 @@ public class StorageManager extends Manager {
         return b;
     }
     
-    public void applyAfterRobot(TaskType type, String binId, String taskId,  Item item) throws StorageException {
-        switch (type) {
-            case STORE: {
-                Bin b = requireBin(binId);
-                if (b.isOccupied()) throw new StorageException("Bin " + binId + " already occupied");
-                if (item == null) throw new StorageException("Item must not be null for STORE");
-                b.commitStore(taskId, item); // RESERVED to OCCUPIED
-                logger.log(systemName, "Item " + item + " stored to " + binId);
-                break;
+    public void applyAfterRobot(TaskType type, String binId, String taskId, Item item) throws StorageException {
+        try {
+            switch (type) {
+                case STORE: {
+                    Bin b = requireBin(binId);
+                    b.commitStore(taskId, item);
+                    logger.log(systemName, "Item " + item + " stored to " + binId);
+                    break;
+                }
+                case RETRIEVE: {
+                    Bin b = requireBin(binId);
+                    Item taken = b.commitRetrieve();
+                    logger.log(systemName, "Item " + taken + " retrieved from " + binId);
+                    break;
+                }
+                default:
+                    throw new StorageException("Unsupported task type " + type);
             }
-            case RETRIEVE: {
-                Bin b = requireBin(binId);
-                if (!b.isOccupied()) throw new StorageException("Bin " + binId + " is empty");
-                b.commitRetrieve(); // OCCUPIED to FREE
-                logger.log(systemName, "Item " + item + " retrieved from " + binId);
-                break;
-            }
-            default:
-                throw new StorageException("Unsupported task type " + type);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            throw new StorageException(e.getMessage(), e);
         }
     }
 
