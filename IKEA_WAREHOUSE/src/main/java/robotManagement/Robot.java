@@ -1,9 +1,11 @@
 package main.java.robotManagement;
 
+import main.java.Entities;
 import main.java.Simulation;
+import main.java.Sleeper;
 import main.java.logging.LogManager;
 
-public class Robot implements Runnable {
+public class Robot implements Runnable, Entities, Sleeper {
 	public enum Status {
 		READY, ERROR, BUSY, WAITING, CHARGING
 	}
@@ -101,6 +103,7 @@ public class Robot implements Runnable {
 		setStatus(Status.READY);
 	}
 
+	@Override
 	public void sleepMinutes(long minutes) {
 	    long baseMillis = minutes * 60_000L;
 	    int speed = Simulation.getSimulationSpeed();   // 1, 2, 4 or 8
@@ -118,6 +121,7 @@ public class Robot implements Runnable {
 	    }
 	}
 
+	@Override
 	public void sleepMillis(long ms) {
 	    int speed = Simulation.getSimulationSpeed();   // 1, 2, 4 or 8
 	    if (speed <= 0) speed = 1;
@@ -159,7 +163,13 @@ public class Robot implements Runnable {
 		setStatus(Status.READY);
 		currentTask = RobotTask.idle();
 	}
+	
+	@Override
+	public void start() {
+		new Thread(this, "Robot-" + this.id).start();
+	}
 
+	@Override
 	public void stop() {
 		running = false;
 	}

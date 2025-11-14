@@ -2,7 +2,7 @@ package main.java;
 
 import main.java.logging.LogManager;
 
-public abstract class Manager implements Runnable {
+public abstract class Manager implements Runnable, Sleeper {
 	protected final String systemName;
 	protected final LogManager logger;
 	protected volatile boolean running = false;

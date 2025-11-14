@@ -110,7 +110,7 @@ public class RobotManager extends Manager {
     @Override
     protected void onStart() {
         for (Robot r : robots.values()) {
-            new Thread(r, "Robot-" + r.getId()).start();
+            r.start();
             logger.log(systemName, "Started robot thread " + r.getId());
         }
     }

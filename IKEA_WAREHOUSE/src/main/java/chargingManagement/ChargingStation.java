@@ -1,10 +1,12 @@
 package main.java.chargingManagement;
 
+import main.java.Entities;
 import main.java.Simulation;
+import main.java.Sleeper;
 import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
 
-public class ChargingStation implements Runnable {
+public class ChargingStation implements Runnable, Entities, Sleeper {
 
     public enum Status {
         READY, CHARGING, ERROR
@@ -60,7 +62,13 @@ public class ChargingStation implements Runnable {
         double secondsNeeded = (double) missing / chargeRatePercentPerSecond;
         return (int) Math.ceil(secondsNeeded / 60.0);
     }
+    
+    @Override
+    public void start() {
+    	new Thread(this, "Station-" + this.id).start();
+    }
 
+    @Override
     public void stop() {
         running = false;
         logger.log(systemName, "Station thread stopped " + this.id);
@@ -88,7 +96,7 @@ public class ChargingStation implements Runnable {
                 }
 
                 r.increaseBatteryPercent(chargeRatePercentPerSecond);
-                sleepSeconds(1);
+                sleepMillis(1000);
 
                 if (r.getBattery() >= 100) {
 
@@ -108,18 +116,7 @@ public class ChargingStation implements Runnable {
         logger.log(systemName, "Station thread stopped " + this.id);
     }
 
-    public void sleepSeconds(long seconds) {
-        long ms = seconds * 1000L;
-        int speed = Simulation.getSimulationSpeed();
-        if (speed <= 0) speed = 1;
-
-        long scaled = ms / speed;
-        if (scaled < 1) scaled = 1;
-
-        try { Thread.sleep(scaled); }
-        catch (InterruptedException e) { Thread.currentThread().interrupt(); }
-    }
-
+    @Override
     public void sleepMillis(long ms) {
         int speed = Simulation.getSimulationSpeed();
         if (speed <= 0) speed = 1;
@@ -130,4 +127,10 @@ public class ChargingStation implements Runnable {
         try { Thread.sleep(scaledMillis); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
+
+	@Override
+	public void sleepMinutes(long minutes) {
+		
+		
+	}
 }

@@ -102,7 +102,7 @@ public class ChargingManager extends Manager {
     @Override
     protected void onStart() {
         for (ChargingStation c : stations) {
-            new Thread(c, "Station-" + c.getId()).start();
+        	c.start();
             logger.log(systemName, "Started station thread " + c.getId());
         }
     }
