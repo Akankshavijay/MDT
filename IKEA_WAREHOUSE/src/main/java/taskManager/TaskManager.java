@@ -99,7 +99,6 @@ public class TaskManager extends Manager {
 		saveSnapshot();
 	}
 
-	// RobotManager callback
 	public void onRobotTaskCompleted(String robotTaskId, boolean success) {
 		WarehouseTask wt = inFlight.remove(robotTaskId);
 
@@ -121,7 +120,6 @@ public class TaskManager extends Manager {
 				wt.setState(TaskState.DONE);
 				logger.log(systemName, "Warehouse task completed: " + wt.getId());
 			} else {
-				// Release reservation for STORE
 				if (wt.getType() == TaskType.STORE && wt.getBinId() != null) {
 					storageManager.releaseReservation(wt.getBinId(), wt.getId());
 				}
@@ -129,7 +127,6 @@ public class TaskManager extends Manager {
 				logger.log(systemName, "Warehouse task failed: " + wt.getId());
 			}
 		} catch (StorageException e) {
-			// ERROR and release reservation
 			if (wt.getType() == TaskType.STORE && wt.getBinId() != null) {
 				try {
 					storageManager.releaseReservation(wt.getBinId(), wt.getId());
@@ -219,7 +216,6 @@ public class TaskManager extends Manager {
 	private void saveSnapshot() {
 		String baseName = "tasks-" + System.currentTimeMillis();
 
-		// binary snapshot
 		File binFile = new File(snapshotDir, baseName + ".bin");
 		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(binFile))) {
 			oos.writeObject(new ArrayList<>(tasks));
@@ -227,7 +223,6 @@ public class TaskManager extends Manager {
 			logger.log(systemName, "Cannot write binary snapshot: " + e.getMessage());
 		}
 
-		// text snapshot
 		File txtFile = new File(snapshotDir, baseName + ".txt");
 		try (Writer w = new OutputStreamWriter(new FileOutputStream(txtFile), "UTF-8")) {
 			for (WarehouseTask t : tasks) {
@@ -292,10 +287,8 @@ public class TaskManager extends Manager {
 		try {
 			switch (next.getType()) {
 			case STORE: {
-				// Reserve bin for this warehouse task
 				Optional<Bin> reserved = storageManager.findAndReserveBinForStore(next.getBinId(), next.getId());
 				if (!reserved.isPresent()) {
-					// Nothing to do
 					return;
 				}
 				Bin target = reserved.get();
@@ -303,7 +296,6 @@ public class TaskManager extends Manager {
 
 				RobotTask rt = TaskAdapter.toRobotTask(next, target);
 
-				// Mark IN_PROGRESS and register in inFlight before giving it to RobotManager
 				next.setState(TaskState.IN_PROGRESS);
 				inFlight.put(rt.getId(), next);
 
@@ -311,7 +303,6 @@ public class TaskManager extends Manager {
 				try {
 					assigned = robotManager.enqueueRobotTask(rt, next);
 				} catch (RobotManagerException e) {
-					// Clean up reservation and inFlight
 					inFlight.remove(rt.getId());
 					try {
 						storageManager.releaseReservation(target.getId(), next.getId());
@@ -323,7 +314,6 @@ public class TaskManager extends Manager {
 				}
 
 				if (!assigned) {
-					// Clean up
 					inFlight.remove(rt.getId());
 					try {
 						storageManager.releaseReservation(target.getId(), next.getId());
@@ -340,14 +330,12 @@ public class TaskManager extends Manager {
 			case RETRIEVE: {
 				Optional<Bin> occ = storageManager.findOccupiedBinForRetrieve(next.getBinId());
 				if (!occ.isPresent()) {
-					// Nothing to do
 					return;
 				}
 				Bin target = occ.get();
 
 				RobotTask rt = TaskAdapter.toRobotTask(next, target);
 
-				// Mark IN_PROGRESS and register in inFlight before giving it to RobotManager
 				next.setState(TaskState.IN_PROGRESS);
 				inFlight.put(rt.getId(), next);
 

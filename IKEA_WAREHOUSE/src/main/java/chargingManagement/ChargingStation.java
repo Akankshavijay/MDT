@@ -50,7 +50,6 @@ public class ChargingStation implements Runnable {
         logger.log(systemName, "Station " + this.id + " set robot " + r.getId());
     }
 
-    // FIXED — correctly compute minutes remaining
     public int timeRemainingMinutes() {
         Robot r = currentRobot;
         if (r == null || status != Status.CHARGING)
@@ -83,17 +82,14 @@ public class ChargingStation implements Runnable {
 
             try {
 
-                // Begin charging
                 if (r.getStatus() != Robot.Status.CHARGING) {
                     r.onChargeStart();
                     r.setStatus(Robot.Status.CHARGING);
                 }
 
-                // Increase battery
                 r.increaseBatteryPercent(chargeRatePercentPerSecond);
-                sleepSeconds(1);  // CORRECTED: per SECOND charging
+                sleepSeconds(1);
 
-                // Finish Charging
                 if (r.getBattery() >= 100) {
 
                     r.setBattery(100);

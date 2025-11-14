@@ -8,24 +8,16 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-/**
- * LogMetadataManager ------------------- Works with the same log directory used
- * by LogManager.
- */
 public class LogMetadataManager {
 
 	private final File baseDir;
 	private final File archiveDir;
 
-	/** filename → subsystem directory */
 	private final Map<String, String> logRegistry = new HashMap<>();
 
-	/**
-	 * Instead of hardcoding "logs/", this version uses the LogManager's directory.
-	 */
+
 	public LogMetadataManager(LogManager logManager) {
 
-		// LogManager stores logs under: target/logs
 		this.baseDir = new File("target/logs");
 		this.archiveDir = new File(baseDir, "archive");
 
@@ -37,7 +29,6 @@ public class LogMetadataManager {
 		autoRegisterExistingLogs();
 	}
 
-	/** Automatically scan and register existing logs in /target/logs */
 	private void autoRegisterExistingLogs() {
 		File[] subsystemDirs = baseDir.listFiles(File::isDirectory);
 		if (subsystemDirs == null)
@@ -60,7 +51,6 @@ public class LogMetadataManager {
 		}
 	}
 
-	/** Register new log file */
 	public void registerLog(File logFile, String subsystem) {
 		if (logFile.exists()) {
 			logRegistry.put(logFile.getName(), subsystem);
@@ -68,7 +58,6 @@ public class LogMetadataManager {
 		}
 	}
 
-	/** Move log file to another subsystem folder */
 	public void moveLog(String fileName, String newSubsystem) {
 		try {
 			String oldSubsystem = logRegistry.get(fileName);
@@ -95,7 +84,6 @@ public class LogMetadataManager {
 		}
 	}
 
-	/** Delete a log file */
 	public void deleteLog(String fileName) {
 		String subsystem = logRegistry.get(fileName);
 		if (subsystem == null) {
@@ -113,7 +101,6 @@ public class LogMetadataManager {
 		}
 	}
 
-	/** Archive all logs for a given subsystem */
 	public void archiveSubsystem(String subsystem) {
 		File subsystemDir = new File(baseDir, subsystem);
 		File[] files = subsystemDir.listFiles();
@@ -143,19 +130,16 @@ public class LogMetadataManager {
 		}
 	}
 
-	/** Return list of subsystems */
 	public Set<String> listSubsystems() {
 		return new HashSet<>(logRegistry.values());
 	}
 
-	/** Refresh map by rescanning file system */
 	public void refreshRegistry() {
 		logRegistry.clear();
 		autoRegisterExistingLogs();
 		System.out.println("Registry refreshed. Total logs: " + logRegistry.size());
 	}
 
-	/** Safe log list retrieval for UI */
 	public List<String> listLogsOfSubsystem(String subsystem) {
 		List<String> result = new ArrayList<>();
 

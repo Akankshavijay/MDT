@@ -12,7 +12,6 @@ public class MultipleExceptionsHandler {
 				throw new IllegalArgumentException("Quantity must be positive");
 			}
 
-			// may throw ArrayIndexOutOfBoundsException
 			int current = inventory[index];
 
 			if (current < quantity) {

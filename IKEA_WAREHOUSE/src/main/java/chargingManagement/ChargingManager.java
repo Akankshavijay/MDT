@@ -28,7 +28,6 @@ public class ChargingManager extends Manager {
     }
 
     public void addRobotToQueue(Robot robot) {
-        // Prevent duplicates  
         if (!queue.contains(robot))
             queue.offer(robot);
     }
@@ -83,16 +82,12 @@ public class ChargingManager extends Manager {
             throw new RobotCantBeAssignedException(
                     "Robot can't be assigned to charging station, station has status ERROR.");
 
-        // VERY IMPORTANT FIX:
         removeRobotFromQueue(robot);
 
-        // Set robot task
         robot.setTask(RobotTask.chargeAt(station.getX(), station.getY()));
 
-        // Mark robot as CHARGING
         robot.setStatus(Robot.Status.CHARGING);
 
-        // Assign to station
         station.setCurrentRobot(robot);
         station.setStatus(ChargingStation.Status.CHARGING);
 
@@ -112,7 +107,6 @@ public class ChargingManager extends Manager {
     protected void loopOnce() {
 
         for (ChargingStation s : stations) {
-            // READY and EMPTY station
             if (s.getCurrentRobot() == null && s.getStatus() == ChargingStation.Status.READY) {
 
                 Robot r = queue.poll();

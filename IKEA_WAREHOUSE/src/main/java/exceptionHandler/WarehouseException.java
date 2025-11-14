@@ -2,7 +2,6 @@ package main.java.exceptionHandler;
 
 import java.io.*;
 
-//Handling Exceptions in IKEA Warehouse
 public class WarehouseException {
 
 	public void handleMultipleExceptions(String filePath) {
@@ -81,9 +80,6 @@ public class WarehouseException {
 	}
 
 	public static class InvalidTaskException extends Exception {
-		/**
-		* 
-		*/
 		private static final long serialVersionUID = 1L;
 
 		public InvalidTaskException(String msg) {
@@ -92,9 +88,6 @@ public class WarehouseException {
 	}
 
 	public static class BinNotFoundException extends Exception {
-		/**
-		* 
-		*/
 		private static final long serialVersionUID = 1L;
 
 		public BinNotFoundException(String msg) {

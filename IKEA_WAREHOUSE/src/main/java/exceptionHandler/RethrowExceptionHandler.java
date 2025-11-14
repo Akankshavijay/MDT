@@ -36,7 +36,6 @@ public class RethrowExceptionHandler {
 		}
 	}
 
-	/** Custom checked exception used for wrapping IO issues. */
 	public static class WarehouseException extends Exception {
 		private static final long serialVersionUID = 1L;
 

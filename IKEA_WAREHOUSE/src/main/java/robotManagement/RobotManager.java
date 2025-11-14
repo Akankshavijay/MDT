@@ -12,14 +12,11 @@ import main.java.taskManager.WarehouseTask;
 
 public class RobotManager extends Manager {
 
-    // Battery logic
     private final int lowBatteryThreshold = 20;
     private final int maxAllowedWaitMinutes = 15;
 
-    // Robot registry
     private final Map<String, Robot> robots = new ConcurrentHashMap<>();
 
-    // FIXED: unbounded queue for tasks (or use a large capacity)
     private final BlockingQueue<RobotTask> tasks = new LinkedBlockingQueue<>();
 
     private final Map<String, WarehouseTask> taskBridge = new ConcurrentHashMap<>();
@@ -50,9 +47,6 @@ public class RobotManager extends Manager {
         return Optional.ofNullable(robots.get(id));
     }
 
-    /**
-     * Add a robot task coming from TaskManager.
-     */
     public boolean enqueueRobotTask(RobotTask robotTask, WarehouseTask source) throws RobotManagerException {
         if (robotTask == null || source == null) {
             throw new RobotManagerException("RobotTask and source WarehouseTask must not be null");
@@ -71,9 +65,6 @@ public class RobotManager extends Manager {
         return true;
     }
 
-    /**
-     * Get a robot that is truly free and not charging.
-     */
     private Optional<Robot> findFreeRobot() {
         return robots.values().stream()
                 .filter(r ->
@@ -83,26 +74,18 @@ public class RobotManager extends Manager {
                 .findFirst();
     }
 
-    /**
-     * Handle low battery.
-     */
     private boolean batteryIsLow(Robot r) {
 
-        // Robot already charging → don't assign tasks
         if (r.getStatus() == Robot.Status.CHARGING)
             return true;
 
-        // Robot already in queue → don't assign tasks
         if (chargingManager.isQueued(r))
             return true;
 
-        // Low battery?
         if (r.getBattery() <= lowBatteryThreshold) {
 
-            // Put robot in charging queue
             chargingManager.addRobotToQueue(r);
 
-            // Mark robot as WAITING (so RobotManager won't give tasks)
             r.setStatus(Robot.Status.WAITING);
 
             logger.log(systemName,
@@ -139,9 +122,7 @@ public class RobotManager extends Manager {
                 ));
             }
         }
-        // ---------------------------------------------------------
-        // 1. Check finished robot tasks and notify TaskManager
-        // ---------------------------------------------------------
+        
         for (Map.Entry<String, RobotTask> entry : new ArrayList<>(activeRobotTasks.entrySet())) {
 
             String robotId = entry.getKey();
@@ -153,7 +134,6 @@ public class RobotManager extends Manager {
                 continue;
             }
 
-            // Finished a task → status READY + IDLE
             if (r.getStatus() == Robot.Status.READY &&
                 r.getCurrentTask().getType() == RobotTask.Type.IDLE) {
 
@@ -166,9 +146,6 @@ public class RobotManager extends Manager {
             }
         }
 
-        // ---------------------------------------------------------
-        // 2. Assign new tasks when robot is free
-        // ---------------------------------------------------------
         RobotTask task = tasks.poll();
         if (task == null)
             return;
@@ -176,7 +153,6 @@ public class RobotManager extends Manager {
         Optional<Robot> free = findFreeRobot();
         if (!free.isPresent()) {
 
-            // No robot free → requeue the task safely
             try {
                 tasks.put(task);
             } catch (InterruptedException ignored) {}
@@ -186,13 +162,11 @@ public class RobotManager extends Manager {
         Robot robot = free.get();
 
         try {
-            // If robot must charge → requeue the original task
             if (batteryIsLow(robot)) {
                 tasks.put(task);
                 return;
             }
 
-            // Assign task
             robot.setTask(task);
             activeRobotTasks.put(robot.getId(), task);
 

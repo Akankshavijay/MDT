@@ -35,8 +35,8 @@ public class Dashboard extends JFrame {
 	private JTable robotTable;
 	private JTable taskTable;
 	private JTable binTable;
-	private JTable stationTable; // charging stations
-	private JTable chargingQueueTable; // charging queue
+	private JTable stationTable;
+	private JTable chargingQueueTable;
 	private MapPanel mapPanel;
 
 	private JTextArea dischargeQueueArea;
@@ -47,15 +47,11 @@ public class Dashboard extends JFrame {
 
 	private final LogMetadataManager logMetadata;
 
-	// Logs UI
 	private JList<String> subsystemList;
 	private JList<String> logFileList;
 
 	private final Timer refreshTimer = new Timer(true);
 
-	// --------------------------------------------------------------------
-	// Constructor
-	// --------------------------------------------------------------------
 	public Dashboard(RobotManager robotManager, StorageManager storageManager, TaskManager taskManager,
 			LogManager logger) {
 
@@ -66,10 +62,8 @@ public class Dashboard extends JFrame {
 		this.taskManager = taskManager;
 		this.logger = logger;
 
-		// Use logger to determine relative path automatically
 		this.logMetadata = new LogMetadataManager(logger);
 
-		// Extract chargingManager
 		try {
 			Field f = RobotManager.class.getDeclaredField("chargingManager");
 			f.setAccessible(true);
@@ -86,9 +80,6 @@ public class Dashboard extends JFrame {
 		startAutoRefresh();
 	}
 
-	// --------------------------------------------------------------------
-	// Reflection helpers
-	// --------------------------------------------------------------------
 	@SuppressWarnings("unchecked")
 	private Map<String, Robot> getRobots() {
 		try {
@@ -124,9 +115,6 @@ public class Dashboard extends JFrame {
 		}
 	}
 
-	// --------------------------------------------------------------------
-	// Main panel with tabs
-	// --------------------------------------------------------------------
 	private JPanel buildMainPanel() {
 		JTabbedPane tabs = new JTabbedPane();
 		
@@ -149,7 +137,6 @@ public class Dashboard extends JFrame {
 	    JPanel container = new JPanel(new BorderLayout());
 	    container.add(mapPanel, BorderLayout.CENTER);
 
-	    // Controls
 	    JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
 	    JButton addBinBtn = new JButton("Add Bin");
@@ -196,11 +183,9 @@ public class Dashboard extends JFrame {
 	        Graphics2D g2 = (Graphics2D) g;
 	        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-	        // Background
 	        g2.setColor(Color.WHITE);
 	        g2.fillRect(0, 0, getWidth(), getHeight());
 
-	        // Simple grid
 	        g2.setColor(new Color(230, 230, 230));
 	        for (int x = MARGIN; x < getWidth(); x += CELL_SIZE) {
 	            g2.drawLine(x, 0, x, getHeight());
@@ -209,7 +194,6 @@ public class Dashboard extends JFrame {
 	            g2.drawLine(0, y, getWidth(), y);
 	        }
 
-	        // Bins
 	        g2.setColor(new Color(180, 200, 255));
 	        for (Bin b : getBins().values()) {
 	            int px = MARGIN + b.getX() * CELL_SIZE;
@@ -225,14 +209,12 @@ public class Dashboard extends JFrame {
 	            g2.drawString(b.getId(), x, y - 4);
 	        }
 
-	        // Robots
 	        for (Robot r : getRobots().values()) {
 	            int px, py;
 	            try {
 	                px = MARGIN + r.getX() * CELL_SIZE;
 	                py = MARGIN + r.getY() * CELL_SIZE;
 	            } catch (Exception ex) {
-	                // if Robot has no getX/getY, skip drawing
 	                continue;
 	            }
 
@@ -247,7 +229,6 @@ public class Dashboard extends JFrame {
 	            g2.drawString(r.getId(), x, y - 4);
 	        }
 
-	        // Charging stations
 	        if (chargingManager != null) {
 	            try {
 	                Field f = ChargingManager.class.getDeclaredField("stations");
@@ -284,10 +265,6 @@ public class Dashboard extends JFrame {
 	    }
 	}
 
-
-	// ====================================================================
-	// ROBOT TAB
-	// ====================================================================
 	private JPanel buildRobotPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 
@@ -355,9 +332,6 @@ public class Dashboard extends JFrame {
 						"Robot Details", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	// ====================================================================
-	// TASK TAB
-	// ====================================================================
 	private JPanel buildTaskPanel() {
 		JPanel panel = new JPanel(new BorderLayout());
 
@@ -403,9 +377,6 @@ public class Dashboard extends JFrame {
 		}
 	}
 
-	// ====================================================================
-	// STATISTICS TAB
-	// ====================================================================
 	private JPanel buildStatsPanel() {
 		JPanel panel = new JPanel(new BorderLayout(10, 10));
 		panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -471,9 +442,6 @@ public class Dashboard extends JFrame {
 				"Bin Details", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	// ====================================================================
-	// CHARGING TAB
-	// ====================================================================
 	private JPanel buildChargingPanel() {
 		JPanel panel = new JPanel(new BorderLayout(10, 10));
 
@@ -646,9 +614,6 @@ public class Dashboard extends JFrame {
 				"Charging Queue Robot Details", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	// ====================================================================
-	// LOG TAB
-	// ====================================================================
 	private JPanel buildLogsPanel() {
 		JPanel panel = new JPanel(new BorderLayout(10, 10));
 
@@ -826,9 +791,6 @@ public class Dashboard extends JFrame {
 				+ "Path:\n" + logFile.getAbsolutePath(), "File Info", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	// ====================================================================
-	// Auto-refresh logic
-	// ====================================================================
 	private void startAutoRefresh() {
 		refreshTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override

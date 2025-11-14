@@ -49,17 +49,11 @@ public class Simulation {
         LogManager logger = new LogManager();
         logger.log("Simulation", "Bootstrapping simulation...");
 
-        // --------------------------------------------------------------------
-        // 1. Create Bins
-        // --------------------------------------------------------------------
         List<Bin> bins = createBinsGrid(BIN_ROWS, BIN_COLS);
         logger.log("Simulation", "Created " + bins.size() + " bins.");
 
         StorageManager storageManager = new StorageManager("StorageManager", logger, bins);
 
-        // --------------------------------------------------------------------
-        // 2. Create Charging Manager & Stations
-        // --------------------------------------------------------------------
         ChargingManager chargingManager = new ChargingManager("ChargingManager", logger);
         List<ChargingStation> stations = createChargingStations(
                 CHARGING_STATION_COUNT,
@@ -68,9 +62,6 @@ public class Simulation {
         );
         logger.log("Simulation", "Created " + stations.size() + " charging stations.");
 
-        // --------------------------------------------------------------------
-        // 3. Create Robot Manager & Robots
-        // --------------------------------------------------------------------
         RobotManager robotManager = new RobotManager("RobotManager", logger);
         robotManager.setChargingManager(chargingManager);
 
@@ -81,9 +72,6 @@ public class Simulation {
         );
         logger.log("Simulation", "Created " + robots.size() + " robots.");
 
-        // --------------------------------------------------------------------
-        // 4. Task Manager & Snapshots
-        // --------------------------------------------------------------------
         File snapshotDir = new File("target/tasksnapshots");
         if (!snapshotDir.exists()) {
             snapshotDir.mkdirs();
@@ -97,14 +85,8 @@ public class Simulation {
                 snapshotDir
         );
 
-        // --------------------------------------------------------------------
-        // 5. Create & Submit Initial STORE + RETRIEVE Tasks
-        // --------------------------------------------------------------------
         submitInitialTasks(taskManager, bins, logger, INITIAL_TASK_COUNT);
 
-        // --------------------------------------------------------------------
-        // 6. Shutdown Hook
-        // --------------------------------------------------------------------
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             logger.log("Simulation", "Shutdown requested, stopping managers and workers...");
             try {
@@ -139,17 +121,11 @@ public class Simulation {
             logger.log("Simulation", "Shutdown sequence finished.");
         }, "Simulation-ShutdownHook"));
 
-        // --------------------------------------------------------------------
-        // 7. Start Dashboard
-        // --------------------------------------------------------------------
         Thread dashboardThread = new Thread(() -> {
             Dashboard.launchDashboard(robotManager, storageManager, taskManager, logger);
         }, "Dashboard-Thread");
         dashboardThread.start();
 
-        // --------------------------------------------------------------------
-        // 8. Start Managers
-        // --------------------------------------------------------------------
         logger.log("Simulation", "Starting managers...");
         storageManager.start();
         chargingManager.start();
@@ -157,9 +133,6 @@ public class Simulation {
         taskManager.start();
         logger.log("Simulation", "Simulation started. Press Ctrl+C to exit.");
 
-        // --------------------------------------------------------------------
-        // 9. Main Loop (speed aware)
-        // --------------------------------------------------------------------
         try {
             while (!Thread.currentThread().isInterrupted()) {
                 long baseSleepMillis = 1000L;
@@ -174,10 +147,6 @@ public class Simulation {
 
         logger.log("Simulation", "Main thread exiting.");
     }
-
-    // ------------------------------------------------------------------------
-    // Helpers
-    // ------------------------------------------------------------------------
 
     private static List<Bin> createBinsGrid(int rows, int cols) {
     	int offsetX = 10;
@@ -229,9 +198,6 @@ public class Simulation {
         return robots;
     }
 
-    /**
-     * Submit STORE tasks followed by RETRIEVE tasks for the same items.
-     */
     private static void submitInitialTasks(
             TaskManager taskManager,
             List<Bin> bins,
@@ -244,9 +210,6 @@ public class Simulation {
             return;
         }
 
-        // -------------------------
-        // 1. STORE TASKS
-        // -------------------------
         for (int i = 0; i < taskCount; i++) {
             Bin targetBin = bins.get(i % binCount);
             String taskId = "TS" + (i + 1);
@@ -272,9 +235,6 @@ public class Simulation {
 
         logger.log("Simulation", "Submitted " + taskCount + " STORE tasks.");
 
-        // -------------------------
-        // 2. RETRIEVE TASKS
-        // -------------------------
         for (int i = 0; i < taskCount; i++) {
             Bin targetBin = bins.get(i % binCount);
             String binId = targetBin.getId();

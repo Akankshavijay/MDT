@@ -173,7 +173,6 @@ public class Robot implements Runnable {
 				currentTask = RobotTask.idle();
 				continue;
 			}
-			// todo: loadout
 			switch (task.getType()) {
 			case MOVE:
 				moveTo(task.getTargetX(), task.getTargetY());
