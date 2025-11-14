@@ -11,6 +11,7 @@ import main.java.exceptionHandler.*;
 import main.java.Manager;
 
 public class ChargingManager extends Manager {
+
     private final List<ChargingStation> stations = new CopyOnWriteArrayList<>();
     private final ConcurrentLinkedQueue<Robot> queue = new ConcurrentLinkedQueue<>();
 
@@ -27,16 +28,17 @@ public class ChargingManager extends Manager {
     }
 
     public void addRobotToQueue(Robot robot) {
+        // Prevent duplicates  
         if (!queue.contains(robot))
             queue.offer(robot);
     }
 
-    public List<ChargingStation> getStations() {
-        return stations;
-    }
-
     public void removeRobotFromQueue(Robot robot) {
         queue.remove(robot);
+    }
+
+    public List<ChargingStation> getStations() {
+        return stations;
     }
 
     public boolean isQueued(Robot robot) {
@@ -54,9 +56,10 @@ public class ChargingManager extends Manager {
     }
 
     public double estimateWaitingTimeMinutes(Robot robot) {
+
         List<ChargingStation> active = stations.stream()
-            .filter(s -> s.getStatus() != ChargingStation.Status.ERROR)
-            .toList();
+                .filter(s -> s.getStatus() != ChargingStation.Status.ERROR)
+                .toList();
 
         int c = active.size();
         if (c == 0) return Double.POSITIVE_INFINITY;
@@ -65,25 +68,31 @@ public class ChargingManager extends Manager {
         for (ChargingStation s : active)
             currentWorkload += s.timeRemainingMinutes();
 
-        int ahead;
         int pos = queuePosition(robot);
-        ahead = (pos >= 0 ? pos : queue.size());
+        int ahead = (pos >= 0 ? pos : queue.size());
 
         double avg = avgChargeMinutes;
         double totalWorkload = currentWorkload + (ahead * avg);
+
         return totalWorkload / c;
     }
 
     public boolean tryAssignRobot(ChargingStation station, Robot robot) {
+
         if (station.getStatus() == ChargingStation.Status.ERROR)
             throw new RobotCantBeAssignedException(
-                "Robot can't be assigned to charging station, station has status ERROR.");
+                    "Robot can't be assigned to charging station, station has status ERROR.");
 
+        // VERY IMPORTANT FIX:
+        removeRobotFromQueue(robot);
+
+        // Set robot task
         robot.setTask(RobotTask.chargeAt(station.getX(), station.getY()));
 
-        // ** FIX: robot must enter CHARGING status immediately **
+        // Mark robot as CHARGING
         robot.setStatus(Robot.Status.CHARGING);
 
+        // Assign to station
         station.setCurrentRobot(robot);
         station.setStatus(ChargingStation.Status.CHARGING);
 
@@ -101,8 +110,11 @@ public class ChargingManager extends Manager {
 
     @Override
     protected void loopOnce() {
+
         for (ChargingStation s : stations) {
+            // READY and EMPTY station
             if (s.getCurrentRobot() == null && s.getStatus() == ChargingStation.Status.READY) {
+
                 Robot r = queue.poll();
                 if (r != null) {
                     try {

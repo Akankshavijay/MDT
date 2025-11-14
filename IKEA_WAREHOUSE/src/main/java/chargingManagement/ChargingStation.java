@@ -1,12 +1,11 @@
 package main.java.chargingManagement;
 
-import java.util.*;
-
 import main.java.Simulation;
 import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
 
 public class ChargingStation implements Runnable {
+
     public enum Status {
         READY, CHARGING, ERROR
     }
@@ -24,9 +23,9 @@ public class ChargingStation implements Runnable {
     private volatile boolean running = true;
 
     public ChargingStation(String id, String systemName, LogManager logger) {
+        this.id = id;
         this.systemName = systemName;
         this.logger = logger;
-        this.id = id;
     }
 
     public ChargingStation(String id, int x, int y, String systemName, LogManager logger) {
@@ -39,25 +38,28 @@ public class ChargingStation implements Runnable {
     public int getX() { return x; }
     public int getY() { return y; }
     public Status getStatus() { return this.status; }
+    public Robot getCurrentRobot() { return this.currentRobot; }
 
     public void setStatus(Status s) {
         this.status = s;
-        logger.log(systemName, "Station " + this.id + " set status " + s.toString());
+        logger.log(systemName, "Station " + this.id + " set status " + s);
     }
-
-    public Robot getCurrentRobot() { return this.currentRobot; }
 
     public void setCurrentRobot(Robot r) {
         this.currentRobot = r;
         logger.log(systemName, "Station " + this.id + " set robot " + r.getId());
     }
 
+    // FIXED — correctly compute minutes remaining
     public int timeRemainingMinutes() {
         Robot r = currentRobot;
         if (r == null || status != Status.CHARGING)
             return 0;
+
         int missing = 100 - r.getBattery();
-        return Math.max(0, missing / (chargeRatePercentPerSecond * 60));
+
+        double secondsNeeded = (double) missing / chargeRatePercentPerSecond;
+        return (int) Math.ceil(secondsNeeded / 60.0);
     }
 
     public void stop() {
@@ -67,30 +69,37 @@ public class ChargingStation implements Runnable {
 
     @Override
     public void run() {
+
         logger.log(systemName, "Station thread started " + this.id);
 
         while (running) {
+
             Robot r = currentRobot;
+
             if (r == null) {
                 sleepMillis(50);
                 continue;
             }
 
             try {
-                // Start charging once
-                if (r.getStatus() == Robot.Status.WAITING) {
+
+                // Begin charging
+                if (r.getStatus() != Robot.Status.CHARGING) {
                     r.onChargeStart();
+                    r.setStatus(Robot.Status.CHARGING);
                 }
 
-                // Charge robot
-                if (r.getStatus() == Robot.Status.CHARGING) {
-                    r.increaseBatteryPercent(chargeRatePercentPerSecond);
-                    sleepMinutes(1);
-                }
+                // Increase battery
+                r.increaseBatteryPercent(chargeRatePercentPerSecond);
+                sleepSeconds(1);  // CORRECTED: per SECOND charging
 
-                // Complete charging
-                if (r.getBattery() >= 99) {
+                // Finish Charging
+                if (r.getBattery() >= 100) {
+
+                    r.setBattery(100);
                     r.onChargeComplete();
+                    logger.log(systemName, "Robot " + r.getId() + " fully charged.");
+
                     currentRobot = null;
                     setStatus(Status.READY);
                 }
@@ -100,18 +109,18 @@ public class ChargingStation implements Runnable {
             }
         }
 
-        logger.log(systemName, "Station thread stopped" + this.id);
+        logger.log(systemName, "Station thread stopped " + this.id);
     }
 
-    public void sleepMinutes(long minutes) {
-        long baseMillis = minutes * 60_000L;
+    public void sleepSeconds(long seconds) {
+        long ms = seconds * 1000L;
         int speed = Simulation.getSimulationSpeed();
         if (speed <= 0) speed = 1;
 
-        long scaledMillis = baseMillis / speed;
-        if (scaledMillis < 1L) scaledMillis = 1L;
+        long scaled = ms / speed;
+        if (scaled < 1) scaled = 1;
 
-        try { Thread.sleep(scaledMillis); }
+        try { Thread.sleep(scaled); }
         catch (InterruptedException e) { Thread.currentThread().interrupt(); }
     }
 
