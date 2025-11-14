@@ -1,15 +1,10 @@
 package main.java.storageManagement;
 
 import main.java.Manager;
-import main.java.communication.WarehouseMessage;
 import main.java.exceptionHandler.StorageException;
-import main.java.exceptionHandler.WarehouseException;
 import main.java.logging.LogManager;
-import main.java.robotManagement.Robot;
-import main.java.robotManagement.RobotTask;
 import main.java.taskManager.TaskType;
 
-import java.io.*;
 import java.util.*;
 
 public class StorageManager extends Manager {

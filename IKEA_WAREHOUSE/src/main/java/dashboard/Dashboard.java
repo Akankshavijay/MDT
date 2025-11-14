@@ -133,7 +133,8 @@ public class Dashboard extends JFrame {
 	}
 
 	private class MapPanel extends JPanel {
-	    private static final int CELL_SIZE = 40;
+		private static final long serialVersionUID = 1L;
+		private static final int CELL_SIZE = 40;
 	    private static final int MARGIN = 40;
 
 	    @Override

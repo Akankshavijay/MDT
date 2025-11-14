@@ -1,6 +1,8 @@
 package main.java.exceptionHandler;
 
 public class RobotManagerException extends Exception {
+	private static final long serialVersionUID = 1L;
+
 	public RobotManagerException(String message) {
 		super(message);
 	}
