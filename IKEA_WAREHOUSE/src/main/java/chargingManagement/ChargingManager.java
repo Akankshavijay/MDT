@@ -30,6 +30,11 @@ public class ChargingManager extends Manager {
 		if (!queue.contains(robot))
 			queue.offer(robot);
 	}
+	
+	public List<ChargingStation> getStations() {
+	    return stations;
+	}
+
 
 	public void removeRobotFromQueue(Robot robot) {
 		queue.remove(robot);
@@ -73,7 +78,7 @@ public class ChargingManager extends Manager {
 		return totalWorkload / c;
 	}
 
-	boolean tryAssignRobot(ChargingStation station, Robot robot) {
+	public boolean tryAssignRobot(ChargingStation station, Robot robot) {
 		if (station.getStatus() == ChargingStation.Status.ERROR)
 			throw new RobotCantBeAssignedException(
 					"Robot can't be assigned to charging station, station has status ERROR.");

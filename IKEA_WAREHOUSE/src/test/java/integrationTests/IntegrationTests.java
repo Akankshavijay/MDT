@@ -40,7 +40,7 @@ public class IntegrationTests {
 		ChargingStation station = new ChargingStation("S1", 0, 0, "ChargingStation", logger);
 		chargingManager.addStation(station);
 
-		Robot robot = new Robot("R1", "Robot", logger);
+		Robot robot = new Robot("R1", 0, 0, 0, "Robot", logger);
 		robot.setBattery(10);
 
 		chargingManager.addRobotToQueue(robot);
@@ -75,7 +75,7 @@ public class IntegrationTests {
 		RobotManager robotManager = new RobotManager("RobotManager", logger);
 		robotManager.setChargingManager(chargingManager);
 
-		Robot robot = new Robot("R1", "Robot", logger);
+		Robot robot = new Robot("R1", 0, 0, 0, "Robot", logger);
 		robot.setBattery(10);
 		robotManager.addRobot(robot);
 
@@ -119,7 +119,7 @@ public class IntegrationTests {
 		Bin b1 = new Bin("B1", 1, 1);
 		StorageManager storageManager = new StorageManager("StorageManager", logger, Arrays.asList(b1));
 		RobotManager robotManager = new RobotManager("RobotManager", logger);
-		Robot robot = new Robot("R1", "Robot", logger);
+		Robot robot = new Robot("R1", 0, 0, 0, "Robot", logger);
 		robotManager.addRobot(robot);
 
 		File snapshotDir = Files.createTempDirectory("tasksnapshots").toFile();
@@ -156,7 +156,7 @@ public class IntegrationTests {
 		assertTrue(storageManager.isBinOccupied("B1"), "B1 must be occupied");
 
 		RobotManager robotManager = new RobotManager("RobotManager", logger);
-		Robot robot = new Robot("R1", "Robot", logger);
+		Robot robot = new Robot("R1", 0, 0, 0, "Robot", logger);
 		robot.setBattery(100);
 		robotManager.addRobot(robot);
 

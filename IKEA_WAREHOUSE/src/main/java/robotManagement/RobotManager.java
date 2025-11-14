@@ -126,7 +126,19 @@ public class RobotManager extends Manager {
 
     @Override
     protected void loopOnce() {
+    	
+        for (Robot r : robots.values()) {
+            if (r.getBattery() <= 20 &&
+                r.getStatus() == Robot.Status.READY &&
+                !chargingManager.isQueued(r)) {
 
+                chargingManager.addRobotToQueue(r);
+                r.setTask(RobotTask.chargeAt(
+                    chargingManager.getStations().get(0).getX(),
+                    chargingManager.getStations().get(0).getY()
+                ));
+            }
+        }
         // ---------------------------------------------------------
         // 1. Check finished robot tasks and notify TaskManager
         // ---------------------------------------------------------
