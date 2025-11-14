@@ -2,6 +2,7 @@ package main.java.chargingManagement;
 
 import java.util.*;
 
+import main.java.Simulation;
 import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
 
@@ -85,11 +86,7 @@ public class ChargingStation implements Runnable {
 		while (running) {
 			Robot r = currentRobot;
 			if (r == null) {
-				try {
-					Thread.sleep(50);
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
+				sleepMillis(50);
 				continue;
 			}
 
@@ -99,7 +96,7 @@ public class ChargingStation implements Runnable {
 
 				if (r.getStatus() == Robot.Status.CHARGING) {
 					r.increaseBatteryPercent(chargeRatePercentPerSecond);
-					Thread.sleep(1000L);
+					sleepMinutes(1);
 				}
 
 				if (r.getBattery() >= 99) {
@@ -113,5 +110,38 @@ public class ChargingStation implements Runnable {
 		}
 
 		logger.log(systemName, "Station thread stopped" + this.id);
+	}
+	
+	public void sleepMinutes(long minutes) {
+	    long baseMillis = minutes * 60_000L;
+	    int speed = Simulation.getSimulationSpeed();   // 1, 2, 4 or 8
+	    if (speed <= 0) speed = 1;
+
+	    long scaledMillis = baseMillis / speed;
+	    if (scaledMillis < 1L) {
+	        scaledMillis = 1L;
+	    }
+
+	    try {
+	        Thread.sleep(scaledMillis);
+	    } catch (InterruptedException e) {
+	        Thread.currentThread().interrupt();
+	    }
+	}
+
+	public void sleepMillis(long ms) {
+	    int speed = Simulation.getSimulationSpeed();   // 1, 2, 4 or 8
+	    if (speed <= 0) speed = 1;
+
+	    long scaledMillis = ms / speed;
+	    if (scaledMillis < 1L) {
+	        scaledMillis = 1L;
+	    }
+
+	    try {
+	        Thread.sleep(scaledMillis);
+	    } catch (InterruptedException e) {
+	        Thread.currentThread().interrupt();
+	    }
 	}
 }

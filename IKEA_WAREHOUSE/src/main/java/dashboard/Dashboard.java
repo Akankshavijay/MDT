@@ -8,7 +8,9 @@ import main.java.storageManagement.Bin;
 import main.java.storageManagement.StorageManager;
 import main.java.taskManager.TaskManager;
 import main.java.taskManager.WarehouseTask;
+import main.java.Simulation;
 import main.java.chargingManagement.ChargingManager;
+import main.java.chargingManagement.ChargingStation;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -35,6 +37,7 @@ public class Dashboard extends JFrame {
 	private JTable binTable;
 	private JTable stationTable; // charging stations
 	private JTable chargingQueueTable; // charging queue
+	private MapPanel mapPanel;
 
 	private JTextArea dischargeQueueArea;
 	private JTextArea chargedQueueArea;
@@ -66,7 +69,7 @@ public class Dashboard extends JFrame {
 		// Use logger to determine relative path automatically
 		this.logMetadata = new LogMetadataManager(logger);
 
-		// Extract chargingManager via reflection
+		// Extract chargingManager
 		try {
 			Field f = RobotManager.class.getDeclaredField("chargingManager");
 			f.setAccessible(true);
@@ -126,7 +129,8 @@ public class Dashboard extends JFrame {
 	// --------------------------------------------------------------------
 	private JPanel buildMainPanel() {
 		JTabbedPane tabs = new JTabbedPane();
-
+		
+		tabs.add("Map", buildMapPanel());
 		tabs.add("Robots", buildRobotPanel());
 		tabs.add("Tasks", buildTaskPanel());
 		tabs.add("Statistics", buildStatsPanel());
@@ -138,6 +142,148 @@ public class Dashboard extends JFrame {
 
 		return panel;
 	}
+	
+	private JPanel buildMapPanel() {
+		mapPanel = new MapPanel();
+
+	    JPanel container = new JPanel(new BorderLayout());
+	    container.add(mapPanel, BorderLayout.CENTER);
+
+	    // Controls
+	    JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+	    JButton addBinBtn = new JButton("Add Bin");
+	    addBinBtn.addActionListener(e -> createBinDialog());
+
+	    JButton addRobotBtn = new JButton("Add Robot");
+	    addRobotBtn.addActionListener(e -> createRobotDialog());
+
+	    JButton addStationBtn = new JButton("Add Station");
+	    addStationBtn.addActionListener(e -> createStationDialog());
+
+	    JLabel speedLabel = new JLabel("Simulation speed:");
+	    JComboBox<String> speedBox = new JComboBox<>(new String[]{"1x", "2x", "4x", "8x"});
+	    speedBox.setSelectedItem("1x");
+	    speedBox.addActionListener(e -> {
+	        String sel = (String) speedBox.getSelectedItem();
+	        int speed = Simulation.SPEED_1X;
+	        if ("2x".equals(sel)) speed = Simulation.SPEED_2X;
+	        else if ("4x".equals(sel)) speed = Simulation.SPEED_4X;
+	        else if ("8x".equals(sel)) speed = Simulation.SPEED_8X;
+	        Simulation.setSimulationSpeed(speed);
+	        logger.log("Dashboard", "Simulation speed set to " + sel);
+	    });
+
+	    controls.add(addBinBtn);
+	    controls.add(addRobotBtn);
+	    controls.add(addStationBtn);
+	    controls.add(Box.createHorizontalStrut(20));
+	    controls.add(speedLabel);
+	    controls.add(speedBox);
+
+	    container.add(controls, BorderLayout.SOUTH);
+
+	    return container;
+	}
+
+	private class MapPanel extends JPanel {
+	    private static final int CELL_SIZE = 40;
+	    private static final int MARGIN = 40;
+
+	    @Override
+	    protected void paintComponent(Graphics g) {
+	        super.paintComponent(g);
+	        Graphics2D g2 = (Graphics2D) g;
+	        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+	        // Background
+	        g2.setColor(Color.WHITE);
+	        g2.fillRect(0, 0, getWidth(), getHeight());
+
+	        // Simple grid
+	        g2.setColor(new Color(230, 230, 230));
+	        for (int x = MARGIN; x < getWidth(); x += CELL_SIZE) {
+	            g2.drawLine(x, 0, x, getHeight());
+	        }
+	        for (int y = MARGIN; y < getHeight(); y += CELL_SIZE) {
+	            g2.drawLine(0, y, getWidth(), y);
+	        }
+
+	        // Bins
+	        g2.setColor(new Color(180, 200, 255));
+	        for (Bin b : getBins().values()) {
+	            int px = MARGIN + b.getX() * CELL_SIZE;
+	            int py = MARGIN + b.getY() * CELL_SIZE;
+	            int size = CELL_SIZE / 2;
+	            int x = px - size / 2;
+	            int y = py - size / 2;
+
+	            g2.setColor(b.isOccupied() ? new Color(100, 150, 255) : new Color(200, 220, 255));
+	            g2.fillRect(x, y, size, size);
+	            g2.setColor(Color.BLACK);
+	            g2.drawRect(x, y, size, size);
+	            g2.drawString(b.getId(), x, y - 4);
+	        }
+
+	        // Robots
+	        for (Robot r : getRobots().values()) {
+	            int px, py;
+	            try {
+	                px = MARGIN + r.getX() * CELL_SIZE;
+	                py = MARGIN + r.getY() * CELL_SIZE;
+	            } catch (Exception ex) {
+	                // if Robot has no getX/getY, skip drawing
+	                continue;
+	            }
+
+	            int size = CELL_SIZE / 2;
+	            int x = px - size / 2;
+	            int y = py - size / 2;
+
+	            g2.setColor(new Color(200, 255, 200));
+	            g2.fillOval(x, y, size, size);
+	            g2.setColor(Color.BLACK);
+	            g2.drawOval(x, y, size, size);
+	            g2.drawString(r.getId(), x, y - 4);
+	        }
+
+	        // Charging stations
+	        if (chargingManager != null) {
+	            try {
+	                Field f = ChargingManager.class.getDeclaredField("stations");
+	                f.setAccessible(true);
+	                @SuppressWarnings("unchecked")
+	                java.util.List<Object> stations = (java.util.List<Object>) f.get(chargingManager);
+
+	                g2.setColor(new Color(255, 220, 180));
+	                for (Object s : stations) {
+	                    int sx = (int) s.getClass().getMethod("getX").invoke(s);
+	                    int sy = (int) s.getClass().getMethod("getY").invoke(s);
+	                    String id = (String) s.getClass().getMethod("getId").invoke(s);
+
+	                    int px = MARGIN + sx * CELL_SIZE;
+	                    int py = MARGIN + sy * CELL_SIZE;
+	                    int size = CELL_SIZE / 2;
+
+	                    int[] xs = { px, px - size / 2, px + size / 2 };
+	                    int[] ys = { py - size / 2, py + size / 2, py + size / 2 };
+	                    g2.setColor(new Color(255, 220, 180));
+	                    g2.fillPolygon(xs, ys, 3);
+	                    g2.setColor(Color.BLACK);
+	                    g2.drawPolygon(xs, ys, 3);
+	                    g2.drawString(id, px - size / 2, py - size);
+	                }
+	            } catch (Exception ignored) {
+	            }
+	        }
+	    }
+
+	    @Override
+	    public Dimension getPreferredSize() {
+	        return new Dimension(800, 600);
+	    }
+	}
+
 
 	// ====================================================================
 	// ROBOT TAB
@@ -695,10 +841,86 @@ public class Dashboard extends JFrame {
 					updateBinTable();
 					updateChargingStationTable();
 					updateChargingQueueTable();
+	                if (mapPanel != null) {
+	                    mapPanel.repaint();
+	                }
 				});
 			}
 		}, 0, 2000);
 	}
+	
+	private void createBinDialog() {
+	    String id = JOptionPane.showInputDialog(this, "Bin ID:", "New Bin", JOptionPane.PLAIN_MESSAGE);
+	    if (id == null || id.isBlank()) return;
+
+	    String sx = JOptionPane.showInputDialog(this, "X coordinate (int):", "0");
+	    String sy = JOptionPane.showInputDialog(this, "Y coordinate (int):", "0");
+	    try {
+	        int x = Integer.parseInt(sx);
+	        int y = Integer.parseInt(sy);
+	        Bin b = new Bin(id, x, y);
+
+	        try {
+	            StorageManager.class.getMethod("addBin", Bin.class).invoke(storageManager, b);
+	        } catch (NoSuchMethodException nsme) {
+	            getBins().put(id, b);
+	        }
+
+	        logger.log("Dashboard", "Created new Bin " + id + " at (" + x + "," + y + ")");
+	    } catch (Exception ex) {
+	        JOptionPane.showMessageDialog(this, "Invalid coordinates: " + ex.getMessage());
+	    }
+	}
+
+	private void createRobotDialog() {
+	    String id = JOptionPane.showInputDialog(this, "Robot ID:", "New Robot", JOptionPane.PLAIN_MESSAGE);
+	    if (id == null || id.isBlank()) return;
+
+	    String sx = JOptionPane.showInputDialog(this, "X coordinate (int):", "0");
+	    String sy = JOptionPane.showInputDialog(this, "Y coordinate (int):", "0");
+	    String sb = JOptionPane.showInputDialog(this, "Initial battery (0-100):", "100");
+
+	    try {
+	        int x = Integer.parseInt(sx);
+	        int y = Integer.parseInt(sy);
+	        int battery = Integer.parseInt(sb);
+	        if (battery < 0) battery = 0;
+	        if (battery > 100) battery = 100;
+
+	        Robot r = new Robot(id, x, y, battery, "RobotManager", logger);
+	        robotManager.addRobot(r);
+
+	        logger.log("Dashboard", "Created new Robot " + id + " at (" + x + "," + y + ") battery=" + battery + "%");
+	    } catch (Exception ex) {
+	        JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
+	    }
+	}
+
+	private void createStationDialog() {
+	    if (chargingManager == null) {
+	        JOptionPane.showMessageDialog(this, "No ChargingManager configured.");
+	        return;
+	    }
+
+	    String id = JOptionPane.showInputDialog(this, "Station ID:", "New Station", JOptionPane.PLAIN_MESSAGE);
+	    if (id == null || id.isBlank()) return;
+
+	    String sx = JOptionPane.showInputDialog(this, "X coordinate (int):", "0");
+	    String sy = JOptionPane.showInputDialog(this, "Y coordinate (int):", "0");
+
+	    try {
+	        int x = Integer.parseInt(sx);
+	        int y = Integer.parseInt(sy);
+
+	        ChargingStation station = new ChargingStation(id, x, y, "ChargingManager", logger);
+	        chargingManager.addStation(station);
+
+	        logger.log("Dashboard", "Created new ChargingStation " + id + " at (" + x + "," + y + ")");
+	    } catch (Exception ex) {
+	        JOptionPane.showMessageDialog(this, "Invalid coordinates: " + ex.getMessage());
+	    }
+	}
+
 
 	private void updateRobotTable() {
 		DefaultTableModel model = (DefaultTableModel) robotTable.getModel();

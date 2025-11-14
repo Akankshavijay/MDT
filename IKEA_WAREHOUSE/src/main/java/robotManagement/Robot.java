@@ -1,5 +1,6 @@
 package main.java.robotManagement;
 
+import main.java.Simulation;
 import main.java.logging.LogManager;
 
 public class Robot implements Runnable {
@@ -101,15 +102,36 @@ public class Robot implements Runnable {
 	}
 
 	public void sleepMinutes(long minutes) {
-		sleepMillis(minutes * 1000L);
+	    long baseMillis = minutes * 60_000L;
+	    int speed = Simulation.getSimulationSpeed();   // 1, 2, 4 or 8
+	    if (speed <= 0) speed = 1;
+
+	    long scaledMillis = baseMillis / speed;
+	    if (scaledMillis < 1L) {
+	        scaledMillis = 1L;
+	    }
+
+	    try {
+	        Thread.sleep(scaledMillis);
+	    } catch (InterruptedException e) {
+	        Thread.currentThread().interrupt();
+	    }
 	}
 
 	public void sleepMillis(long ms) {
-		try {
-			Thread.sleep(ms);
-		} catch (InterruptedException ie) {
-			Thread.currentThread().interrupt();
-		}
+	    int speed = Simulation.getSimulationSpeed();   // 1, 2, 4 or 8
+	    if (speed <= 0) speed = 1;
+
+	    long scaledMillis = ms / speed;
+	    if (scaledMillis < 1L) {
+	        scaledMillis = 1L;
+	    }
+
+	    try {
+	        Thread.sleep(scaledMillis);
+	    } catch (InterruptedException e) {
+	        Thread.currentThread().interrupt();
+	    }
 	}
 
 	public void increaseBatteryPercent(int pct) {
