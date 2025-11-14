@@ -48,6 +48,7 @@ public class LogManager {
 			writer.write(line);
 			writer.newLine();
 			writer.flush();
+			System.out.println(line);
 		} catch (IOException e) {
 			System.out.println("Logging failed for " + subsystem + ": " + e.getMessage());
 		}

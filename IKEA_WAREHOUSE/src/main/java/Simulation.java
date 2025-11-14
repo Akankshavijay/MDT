@@ -16,6 +16,26 @@ import java.io.File;
 import java.util.Arrays;
 
 public class Simulation {
+    public static final int SPEED_1X = 1;
+    public static final int SPEED_2X = 2;
+    public static final int SPEED_4X = 4;
+    public static final int SPEED_8X = 8;
+    
+    private static volatile int simulationSpeed = SPEED_1X;
+    
+    public static int getSimulationSpeed() {
+        int s = simulationSpeed;
+        return (s == SPEED_1X || s == SPEED_2X || s == SPEED_4X || s == SPEED_8X)
+                ? s
+                : SPEED_1X;
+    }
+
+    public static void setSimulationSpeed(int speed) {
+        if (speed != SPEED_1X && speed != SPEED_2X && speed != SPEED_4X && speed != SPEED_8X) {
+            speed = SPEED_1X;
+        }
+        simulationSpeed = speed;
+    }
 
 	public static void main(String[] args) throws Exception {
 		LogManager logger = new LogManager();
