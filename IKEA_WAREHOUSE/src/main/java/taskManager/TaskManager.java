@@ -42,36 +42,12 @@ public class TaskManager extends Manager {
 		logger.log(systemName, "TaskManager initialized. Loaded tasks: " + tasks.size());
 	}
 
-//    public void connectStreams(OutputStream byteStream, Writer charStream) {
-//        this.byteStream = byteStream;
-//        this.charStream = charStream;
-//        logger.log(systemName, "Streams connected to TaskManager");
-//    }
-
 	public void submit(WarehouseTask task) throws TaskManagerException {
 		if (task == null)
 			throw new TaskManagerException("Task is null");
 		tasks.add(task);
 		logger.log(systemName, "Task submitted: " + task);
 	}
-
-//    public WarehouseTask addTask(String id, String action, String binId, String itemId, String itemType) {
-//        WarehouseTask task = new WarehouseTask(id, action, binId, itemId, itemType);
-//
-//        try {
-//            confirmWithStorage(task);
-//            task.setState(TaskState.STANDING_BY);
-//            tasks.add(task);
-//            logger.log(systemName, "Added task: " + task);
-//        } catch (TaskManagerException e) {
-//            task.setState(TaskState.ERROR);
-//            tasks.add(task);
-//            logger.log(systemName, "Added task in ERROR state: " + task + " cause " + e.getMessage());
-//        }
-//
-//        saveSnapshot();
-//        return task;
-//    }
 
 	public List<WarehouseTask> getTasksSnapshot() {
 		synchronized (tasks) {
@@ -139,50 +115,6 @@ public class TaskManager extends Manager {
 		}
 	}
 
-//    public void startTask(String taskId) {
-//        WarehouseTask t = findTask(taskId);
-//        if (t.getState() != TaskState.STANDING_BY) {
-//            throw new TaskManagerException("Task " + taskId + " is not in STANDING_BY state.");
-//        }
-//
-//        t.setState(TaskState.IN_PROGRESS);
-//        writeToStreams("[" + LocalDateTime.now() + "] Task " + t.getId() + " IN_PROGRESS\n");
-//
-//        try {
-//            if ("store".equalsIgnoreCase(t.getAction())) {
-//                storageManager.requestStore(t.getBinId(),
-//                        new Item(t.getItemId(), t.getItemType()));
-//            } else if ("retrieve".equalsIgnoreCase(t.getAction())) {
-//                storageManager.requestRetrieve(t.getBinId(),
-//                        new Item(t.getItemId(), t.getItemType()));
-//            } else {
-//                throw new TaskManagerException("Unknown action: " + t.getAction());
-//            }
-//
-//            t.setState(TaskState.DONE);
-//            logger.log(systemName, "Task DONE: " + t);
-//            writeToStreams("[" + LocalDateTime.now() + "] Task " + t.getId() + " DONE\n");
-//        } catch (RuntimeException e) {
-//            t.setState(TaskState.ERROR);
-//            logger.log(systemName, "Task ERROR: " + t + " cause=" + e.getMessage());
-//            writeToStreams("[" + LocalDateTime.now() + "] Task " + t.getId() + " ERROR\n");
-//            throw new TaskManagerException("Failed to run task " + t.getId(), e);
-//        } finally {
-//            saveSnapshot();
-//        }
-//    }
-
-//    public void cancelTask(String taskId) {
-//        WarehouseTask t = findTask(taskId);
-//        if (t.getState() == TaskState.DONE || t.getState() == TaskState.ERROR) {
-//            return; // already finished
-//        }
-//        t.setState(TaskState.CANCELED);
-//        logger.log(systemName, "Task canceled: " + t);
-//        writeToStreams("[" + LocalDateTime.now() + "] Task " + t.getId() + " → CANCELED\n");
-//        saveSnapshot();
-//    }
-
 	private WarehouseTask findTask(String taskId) {
 		for (WarehouseTask t : tasks) {
 			if (t.getId().equals(taskId)) {
@@ -191,26 +123,6 @@ public class TaskManager extends Manager {
 		}
 		throw new TaskManagerException("Task not found: " + taskId);
 	}
-
-//    private void confirmWithStorage(WarehouseTask task) {
-//        try {
-//            if ("store".equalsIgnoreCase(task.getAction())) {
-//                boolean occupied = storageManager.isBinOccupied(task.getBinId());
-//                if (occupied) {
-//                    throw new TaskManagerException("Bin " + task.getBinId() + " is already occupied.");
-//                }
-//            } else if ("retrieve".equalsIgnoreCase(task.getAction())) {
-//                boolean hasItem = storageManager.getItem(task.getBinId()).isPresent();
-//                if (!hasItem) {
-//                    throw new TaskManagerException("Bin " + task.getBinId() + " has no item to retrieve.");
-//                }
-//            } else {
-//                throw new TaskManagerException("Unknown action: " + task.getAction());
-//            }
-//        } catch (RuntimeException e) {
-//            throw new TaskManagerException("StorageManager failed to confirm task: " + e.getMessage(), e);
-//        }
-//    }
 
 	private void saveSnapshot() {
 		String baseName = "tasks-" + System.currentTimeMillis();
