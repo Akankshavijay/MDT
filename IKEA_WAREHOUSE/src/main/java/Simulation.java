@@ -25,11 +25,11 @@ public class Simulation {
 
     private static volatile int simulationSpeed = SPEED_1X;
 
-    private static final int BIN_ROWS = 4;
-    private static final int BIN_COLS = 4;
+    private static final int BIN_ROWS = 50;
+    private static final int BIN_COLS = 100;
     private static final int ROBOT_COUNT = 10;
     private static final int CHARGING_STATION_COUNT = 3;
-    private static final int INITIAL_TASK_COUNT = 10;
+    private static final int INITIAL_TASK_COUNT = 10000;
 
     public static int getSimulationSpeed() {
         int s = simulationSpeed;
