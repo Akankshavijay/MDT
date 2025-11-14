@@ -18,7 +18,6 @@ import java.util.List;
 
 public class Simulation {
 
-    // Supported simulation speeds
     public static final int SPEED_1X = 1;
     public static final int SPEED_2X = 2;
     public static final int SPEED_4X = 4;
@@ -26,12 +25,11 @@ public class Simulation {
 
     private static volatile int simulationSpeed = SPEED_1X;
 
-    // Default scaling parameters – tweak as you like
-    private static final int BIN_ROWS = 100;          // 10 rows of bins
-    private static final int BIN_COLS = 4;           // 4 columns per row -> 40 bins total
-    private static final int ROBOT_COUNT = 10;       // 10 robots
-    private static final int CHARGING_STATION_COUNT = 5; // 5 charging stations
-    private static final int INITIAL_TASK_COUNT = 200;    // Will create 200 store + 200 retrieve tasks automatically
+    private static final int BIN_ROWS = 4;
+    private static final int BIN_COLS = 4;
+    private static final int ROBOT_COUNT = 10;
+    private static final int CHARGING_STATION_COUNT = 3;
+    private static final int INITIAL_TASK_COUNT = 10;
 
     public static int getSimulationSpeed() {
         int s = simulationSpeed;
@@ -182,9 +180,12 @@ public class Simulation {
     // ------------------------------------------------------------------------
 
     private static List<Bin> createBinsGrid(int rows, int cols) {
+    	int offsetX = 10;
+    	int offsetY = 0;
+    	
         List<Bin> bins = new ArrayList<>(rows * cols);
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < cols; x++) {
+        for (int y = 0 + offsetY; y < rows + offsetY; y++) {
+            for (int x = 0 + offsetX; x < cols + offsetX; x++) {
                 String id = "B" + y + "_" + x;
                 bins.add(new Bin(id, x, y));
             }
