@@ -11,139 +11,189 @@ import main.java.taskManager.TaskManager;
 import main.java.taskManager.WarehouseTask;
 
 public class RobotManager extends Manager {
-	private final int capacity = 1;
-	private final int lowBatteryThreshold = 20;
-	private final int maxAllowedWaitMinutes = 15;
 
-	private final Map<String, Robot> robots = new ConcurrentHashMap<>();
-	private final BlockingQueue<RobotTask> tasks = new LinkedBlockingQueue<>(capacity);
-	private final Map<String, WarehouseTask> taskBridge = new ConcurrentHashMap<>();
-	private final Map<String, RobotTask> activeRobotTasks = new ConcurrentHashMap<>();
+    // Battery logic
+    private final int lowBatteryThreshold = 20;
+    private final int maxAllowedWaitMinutes = 15;
 
-	private ChargingManager chargingManager;
-	private TaskManager taskManager;
+    // Robot registry
+    private final Map<String, Robot> robots = new ConcurrentHashMap<>();
 
-	public RobotManager(String systemName, LogManager logger) {
-		super(systemName, logger);
-		onInitialize();
-	}
+    // FIXED: unbounded queue for tasks (or use a large capacity)
+    private final BlockingQueue<RobotTask> tasks = new LinkedBlockingQueue<>();
 
-	public void setChargingManager(ChargingManager chargingManager) {
-		this.chargingManager = chargingManager;
-	}
+    private final Map<String, WarehouseTask> taskBridge = new ConcurrentHashMap<>();
+    private final Map<String, RobotTask> activeRobotTasks = new ConcurrentHashMap<>();
 
-	public void setTaskManager(TaskManager taskManager) {
-		this.taskManager = taskManager;
-	}
+    private ChargingManager chargingManager;
+    private TaskManager taskManager;
 
-	public void addRobot(Robot robot) {
-		robots.put(robot.getId(), robot);
-		logger.log(systemName, "Added robot " + robot.getId());
-	}
+    public RobotManager(String systemName, LogManager logger) {
+        super(systemName, logger);
+        onInitialize();
+    }
 
-	public Optional<Robot> getRobot(String id) {
-		return Optional.ofNullable(robots.get(id));
-	}
+    public void setChargingManager(ChargingManager chargingManager) {
+        this.chargingManager = chargingManager;
+    }
 
-	public boolean enqueueRobotTask(RobotTask robotTask, WarehouseTask source) throws RobotManagerException {
-		if (robotTask == null || source == null) {
-			throw new RobotManagerException("RobotTask and source WarehouseTask must not be null");
-		}
-		boolean ok = tasks.offer(robotTask);
-		if (!ok) {
-			throw new RobotManagerException("Robot task queue is full");
-		}
-		taskBridge.put(robotTask.getId(), source);
-		logger.log(systemName, "Enqueued robot task " + robotTask + " for warehouse task " + source.getId());
-		return true;
-	}
+    public void setTaskManager(TaskManager taskManager) {
+        this.taskManager = taskManager;
+    }
 
-	private Optional<Robot> findFreeRobot() {
-		return robots.values().stream()
-				.filter(r -> r.getStatus() == Robot.Status.READY && r.getCurrentTask().getType() == RobotTask.Type.IDLE)
-				.findFirst();
-	}
+    public void addRobot(Robot robot) {
+        robots.put(robot.getId(), robot);
+        logger.log(systemName, "Added robot " + robot.getId());
+    }
 
-	private boolean batteryIsLow(Robot r) {
-		if (r.getStatus() == Robot.Status.CHARGING || r.getStatus() == Robot.Status.WAITING)
-			return true;
-		int b = r.getBattery();
-		if (b <= lowBatteryThreshold) {
-			double eta = chargingManager.estimateWaitingTimeMinutes(r);
-			if (eta <= maxAllowedWaitMinutes) {
-				if (!chargingManager.isQueued(r))
-					chargingManager.addRobotToQueue(r);
-				r.setTask(RobotTask.chargeAt(r.getX(), r.getY()));
-				logger.log(systemName, "Set charging task to robot " + r.getId() + " bat: " + r.getBattery());
-				return true;
-			} else {
-				r.setTask(RobotTask.idle());
-				r.setStatus(Robot.Status.ERROR);
-				logger.log(systemName, "ETA for robot " + r.getId() + " is too big: " + eta);
-			}
-		}
-		return false;
-	}
+    public Optional<Robot> getRobot(String id) {
+        return Optional.ofNullable(robots.get(id));
+    }
 
-	@Override
-	protected void onStart() {
-		for (Robot r : robots.values()) {
-			new Thread(r, "Robot-" + r.getId()).start();
-			logger.log(systemName, "Started robot thread " + r.getId());
-		}
-	}
+    /**
+     * Add a robot task coming from TaskManager.
+     */
+    public boolean enqueueRobotTask(RobotTask robotTask, WarehouseTask source) throws RobotManagerException {
+        if (robotTask == null || source == null) {
+            throw new RobotManagerException("RobotTask and source WarehouseTask must not be null");
+        }
 
-	@Override
-	protected void loopOnce() {
-		// Check for finished robot tasks
-		for (Map.Entry<String, RobotTask> entry : new ArrayList<>(activeRobotTasks.entrySet())) {
-			String robotId = entry.getKey();
-			RobotTask assigned = entry.getValue();
-			Robot r = robots.get(robotId);
-			if (r == null) {
-				activeRobotTasks.remove(robotId);
-				continue;
-			}
+        try {
+            tasks.put(robotTask);  // FIX: always enqueue safely
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RobotManagerException("Failed to enqueue robot task");
+        }
 
-			if (r.getStatus() == Robot.Status.READY && r.getCurrentTask().getType() == RobotTask.Type.IDLE) {
+        taskBridge.put(robotTask.getId(), source);
+        logger.log(systemName, "Enqueued robot task " + robotTask + " for warehouse task " + source.getId());
 
-				activeRobotTasks.remove(robotId);
-				WarehouseTask src = taskBridge.remove(assigned.getId());
+        return true;
+    }
 
-				if (src != null && taskManager != null) {
-					taskManager.onRobotTaskCompleted(assigned.getId(), true);
-				}
-			}
-		}
+    /**
+     * Get a robot that is truly free and not charging.
+     */
+    private Optional<Robot> findFreeRobot() {
+        return robots.values().stream()
+                .filter(r ->
+                        r.getStatus() == Robot.Status.READY &&
+                        r.getCurrentTask().getType() == RobotTask.Type.IDLE &&
+                        r.getBattery() > lowBatteryThreshold)
+                .findFirst();
+    }
 
-		// Assign new tasks to free robots
-		RobotTask task = tasks.poll();
-		if (task == null)
-			return;
+    /**
+     * Handle low battery.
+     */
+    private boolean batteryIsLow(Robot r) {
 
-		Optional<Robot> free = findFreeRobot();
-		if (!free.isPresent()) {
-			tasks.offer(task);
-			return;
-		}
+        // Robot already charging → don't assign tasks
+        if (r.getStatus() == Robot.Status.CHARGING)
+            return true;
 
-		Robot robot = free.get();
-		try {
-			if (!batteryIsLow(robot)) {
-				robot.setTask(task);
-				activeRobotTasks.put(robot.getId(), task);
-				logger.log(systemName, "Set task to robot " + robot.getId());
-			} else {
-				logger.log(systemName, "Robot " + robot.getId() + " battery low, task " + task.getId() + " deferred");
-			}
+        // Robot already in queue → don't assign tasks
+        if (chargingManager.isQueued(r))
+            return true;
 
-		} catch (Exception e) {
-			logger.log(systemName, "Robot execution error: " + e.getMessage());
-			WarehouseTask src = taskBridge.remove(task.getId());
+        // Low battery?
+        if (r.getBattery() <= lowBatteryThreshold) {
 
-			if (src != null && taskManager != null) {
-				taskManager.onRobotTaskCompleted(task.getId(), false);
-			}
-		}
-	}
+            // Put robot in charging queue
+            chargingManager.addRobotToQueue(r);
+
+            // Mark robot as WAITING (so RobotManager won't give tasks)
+            r.setStatus(Robot.Status.WAITING);
+
+            logger.log(systemName,
+                    "Robot " + r.getId() + " LOW battery (" + r.getBattery()
+                            + "%). Queued for charging.");
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    @Override
+    protected void onStart() {
+        for (Robot r : robots.values()) {
+            new Thread(r, "Robot-" + r.getId()).start();
+            logger.log(systemName, "Started robot thread " + r.getId());
+        }
+    }
+
+    @Override
+    protected void loopOnce() {
+
+        // ---------------------------------------------------------
+        // 1. Check finished robot tasks and notify TaskManager
+        // ---------------------------------------------------------
+        for (Map.Entry<String, RobotTask> entry : new ArrayList<>(activeRobotTasks.entrySet())) {
+
+            String robotId = entry.getKey();
+            RobotTask assigned = entry.getValue();
+            Robot r = robots.get(robotId);
+
+            if (r == null) {
+                activeRobotTasks.remove(robotId);
+                continue;
+            }
+
+            // Finished a task → status READY + IDLE
+            if (r.getStatus() == Robot.Status.READY &&
+                r.getCurrentTask().getType() == RobotTask.Type.IDLE) {
+
+                activeRobotTasks.remove(robotId);
+
+                WarehouseTask src = taskBridge.remove(assigned.getId());
+                if (src != null && taskManager != null) {
+                    taskManager.onRobotTaskCompleted(assigned.getId(), true);
+                }
+            }
+        }
+
+        // ---------------------------------------------------------
+        // 2. Assign new tasks when robot is free
+        // ---------------------------------------------------------
+        RobotTask task = tasks.poll();
+        if (task == null)
+            return;
+
+        Optional<Robot> free = findFreeRobot();
+        if (!free.isPresent()) {
+
+            // No robot free → requeue the task safely
+            try {
+                tasks.put(task);
+            } catch (InterruptedException ignored) {}
+            return;
+        }
+
+        Robot robot = free.get();
+
+        try {
+            // If robot must charge → requeue the original task
+            if (batteryIsLow(robot)) {
+                tasks.put(task);
+                return;
+            }
+
+            // Assign task
+            robot.setTask(task);
+            activeRobotTasks.put(robot.getId(), task);
+
+            logger.log(systemName, "Assigned task " + task.getId() + " to robot " + robot.getId());
+
+        } catch (Exception e) {
+
+            logger.log(systemName, "Robot execution error: " + e.getMessage());
+
+            WarehouseTask src = taskBridge.remove(task.getId());
+            if (src != null && taskManager != null) {
+                taskManager.onRobotTaskCompleted(task.getId(), false);
+            }
+        }
+    }
 }

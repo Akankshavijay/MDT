@@ -192,13 +192,13 @@ public class Robot implements Runnable {
 				currentTask = RobotTask.idle();
 				break;
 			case CHARGE:
-				if (getX() != task.getTargetX() || getY() != task.getTargetY()) {
-					moveTo(task.getTargetX(), task.getTargetY());
-				} else {
-					onChargeWait();
-					sleepMillis(1000);
-				}
-				break;
+			    if (getX() != task.getTargetX() || getY() != task.getTargetY()) {
+			        moveTo(task.getTargetX(), task.getTargetY());
+			    } else {
+			        onChargeWait();
+			        sleepMillis(1000);
+			    }
+			    break;
 			case IDLE:
 				sleepMillis(1000);
 			default:
