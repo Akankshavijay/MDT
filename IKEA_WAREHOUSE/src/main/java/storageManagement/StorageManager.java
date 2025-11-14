@@ -123,6 +123,10 @@ public class StorageManager extends Manager {
 	public void addBin(Bin bin) {
 		bins.put(bin.getId(), bin);
 	}
+	
+	public Map<String, Bin> getBins() {
+		return bins;
+	}
 
 	@Override
 	protected void loopOnce() {

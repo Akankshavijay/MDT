@@ -63,13 +63,7 @@ public class Dashboard extends JFrame {
 		this.logger = logger;
 
 		this.logMetadata = new LogMetadataManager(logger);
-
-		try {
-			Field f = RobotManager.class.getDeclaredField("chargingManager");
-			f.setAccessible(true);
-			this.chargingManager = (ChargingManager) f.get(robotManager);
-		} catch (Exception ignore) {
-		}
+		this.chargingManager = robotManager.getChargingManager();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(1500, 850);
@@ -78,41 +72,6 @@ public class Dashboard extends JFrame {
 
 		add(buildMainPanel(), BorderLayout.CENTER);
 		startAutoRefresh();
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, Robot> getRobots() {
-		try {
-			Field f = RobotManager.class.getDeclaredField("robots");
-			f.setAccessible(true);
-			return (Map<String, Robot>) f.get(robotManager);
-		} catch (Exception e) {
-			return Collections.emptyMap();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private Map<String, Bin> getBins() {
-		try {
-			Field f = StorageManager.class.getDeclaredField("bins");
-			f.setAccessible(true);
-			return (Map<String, Bin>) f.get(storageManager);
-		} catch (Exception e) {
-			return Collections.emptyMap();
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private Queue<Robot> getChargingQueue() {
-		if (chargingManager == null)
-			return new ArrayDeque<>();
-		try {
-			Field f = ChargingManager.class.getDeclaredField("queue");
-			f.setAccessible(true);
-			return (Queue<Robot>) f.get(chargingManager);
-		} catch (Exception e) {
-			return new ArrayDeque<>();
-		}
 	}
 
 	private JPanel buildMainPanel() {
@@ -195,7 +154,7 @@ public class Dashboard extends JFrame {
 	        }
 
 	        g2.setColor(new Color(180, 200, 255));
-	        for (Bin b : getBins().values()) {
+	        for (Bin b : storageManager.getBins().values()) {
 	            int px = MARGIN + b.getX() * CELL_SIZE;
 	            int py = MARGIN + b.getY() * CELL_SIZE;
 	            int size = CELL_SIZE / 2;
@@ -209,7 +168,7 @@ public class Dashboard extends JFrame {
 	            g2.drawString(b.getId(), x, y - 4);
 	        }
 
-	        for (Robot r : getRobots().values()) {
+	        for (Robot r : robotManager.getRobots().values()) {
 	            int px, py;
 	            try {
 	                px = MARGIN + r.getX() * CELL_SIZE;
@@ -305,7 +264,7 @@ public class Dashboard extends JFrame {
 
 	private void showAllRobots() {
 		StringBuilder sb = new StringBuilder();
-		for (Robot r : getRobots().values()) {
+		for (Robot r : robotManager.getRobots().values()) {
 			sb.append("ID: ").append(r.getId()).append("\n").append("Battery: ").append(r.getBattery()).append("%\n")
 					.append("Status: ").append(r.getStatus()).append("\n").append("Task: ").append(r.getCurrentTask())
 					.append("\n").append("----------------------\n");
@@ -321,7 +280,7 @@ public class Dashboard extends JFrame {
 		}
 
 		String id = robotTable.getValueAt(row, 0).toString();
-		Robot r = getRobots().get(id);
+		Robot r = robotManager.getRobots().get(id);
 		if (r == null)
 			return;
 
@@ -420,7 +379,7 @@ public class Dashboard extends JFrame {
 
 	private void showAllBins() {
 		StringBuilder sb = new StringBuilder();
-		for (Bin b : getBins().values()) {
+		for (Bin b : storageManager.getBins().values()) {
 			sb.append("Bin: ").append(b.getId()).append("\n").append("Occupied: ").append(b.isOccupied()).append("\n")
 					.append("Item: ").append(b.getItem().orElse(null)).append("\n").append("------------------\n");
 		}
@@ -435,7 +394,7 @@ public class Dashboard extends JFrame {
 		}
 
 		String id = binTable.getValueAt(row, 0).toString();
-		Bin b = getBins().get(id);
+		Bin b = storageManager.getBins().get(id);
 
 		JOptionPane.showMessageDialog(this,
 				"Bin: " + b.getId() + "\n" + "Occupied: " + b.isOccupied() + "\n" + "Item: " + b.getItem().orElse(null),
@@ -580,7 +539,7 @@ public class Dashboard extends JFrame {
 			return;
 		}
 
-		Robot r = getRobots().get(robotId);
+		Robot r = robotManager.getRobots().get(robotId);
 		if (r == null) {
 			JOptionPane.showMessageDialog(this, "Robot not found in RobotManager.");
 			return;
@@ -602,7 +561,7 @@ public class Dashboard extends JFrame {
 		}
 
 		String robotId = chargingQueueTable.getValueAt(row, 0).toString();
-		Robot r = getRobots().get(robotId);
+		Robot r = robotManager.getRobots().get(robotId);
 		if (r == null) {
 			JOptionPane.showMessageDialog(this, "Robot not found in RobotManager.");
 			return;
@@ -825,7 +784,7 @@ public class Dashboard extends JFrame {
 	        try {
 	            StorageManager.class.getMethod("addBin", Bin.class).invoke(storageManager, b);
 	        } catch (NoSuchMethodException nsme) {
-	            getBins().put(id, b);
+	        	storageManager.getBins().put(id, b);
 	        }
 
 	        logger.log("Dashboard", "Created new Bin " + id + " at (" + x + "," + y + ")");
@@ -888,7 +847,7 @@ public class Dashboard extends JFrame {
 		DefaultTableModel model = (DefaultTableModel) robotTable.getModel();
 		model.setRowCount(0);
 
-		for (Robot r : getRobots().values()) {
+		for (Robot r : robotManager.getRobots().values()) {
 			model.addRow(new Object[] { r.getId(), "Robot", r.getBattery() + "%", r.getStatus(),
 					r.getCurrentTask() == null ? "None"
 							: r.getCurrentTask().getType() + " (" + r.getCurrentTask().getId() + ")" });
@@ -896,7 +855,7 @@ public class Dashboard extends JFrame {
 	}
 
 	private void updateQueues() {
-		Queue<Robot> q = getChargingQueue();
+		Queue<Robot> q = chargingManager.getQueue();
 
 		StringBuilder sb = new StringBuilder();
 		for (Robot r : q) {
@@ -905,7 +864,7 @@ public class Dashboard extends JFrame {
 		dischargeQueueArea.setText(sb.isEmpty() ? "No robots in queue." : sb.toString());
 
 		StringBuilder charged = new StringBuilder();
-		for (Robot r : getRobots().values()) {
+		for (Robot r : robotManager.getRobots().values()) {
 			if (r.getBattery() >= 95 && r.getStatus() == Robot.Status.READY) {
 				charged.append(r.getId()).append(" (").append(r.getBattery()).append("%)\n");
 			}
@@ -923,7 +882,7 @@ public class Dashboard extends JFrame {
 	}
 
 	private void updateStats() {
-		Map<String, Bin> bins = getBins();
+		Map<String, Bin> bins = storageManager.getBins();
 
 		long used = bins.values().stream().filter(Bin::isOccupied).count();
 		long total = bins.size();
@@ -933,7 +892,7 @@ public class Dashboard extends JFrame {
 		binUsageBar.setValue(percent);
 		binUsageBar.setString(used + " / " + total + " occupied");
 
-		long lowBattery = getRobots().values().stream().filter(r -> r.getBattery() <= 20).count();
+		long lowBattery = robotManager.getRobots().values().stream().filter(r -> r.getBattery() <= 20).count();
 
 		lowBatteryLabel.setText("Low battery robots: " + lowBattery);
 	}
@@ -942,7 +901,7 @@ public class Dashboard extends JFrame {
 		DefaultTableModel model = (DefaultTableModel) binTable.getModel();
 		model.setRowCount(0);
 
-		for (Bin b : getBins().values()) {
+		for (Bin b : storageManager.getBins().values()) {
 			model.addRow(new Object[] { b.getId(), b.isOccupied() ? "Occupied" : "Free",
 					b.getItem().map(i -> i.getId() + " (" + i.getType() + ")").orElse("-") });
 		}

@@ -39,6 +39,10 @@ public class ChargingManager extends Manager {
     public List<ChargingStation> getStations() {
         return stations;
     }
+    
+    public Queue<Robot> getQueue() {
+    	return queue;
+    }
 
     public boolean isQueued(Robot robot) {
         return queue.contains(robot);

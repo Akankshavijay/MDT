@@ -33,6 +33,10 @@ public class RobotManager extends Manager {
     public void setChargingManager(ChargingManager chargingManager) {
         this.chargingManager = chargingManager;
     }
+    
+    public ChargingManager getChargingManager() {
+    	return this.chargingManager;
+    }
 
     public void setTaskManager(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -45,6 +49,10 @@ public class RobotManager extends Manager {
 
     public Optional<Robot> getRobot(String id) {
         return Optional.ofNullable(robots.get(id));
+    }
+    
+    public Map<String, Robot> getRobots() {
+    	return robots;
     }
 
     public boolean enqueueRobotTask(RobotTask robotTask, WarehouseTask source) throws RobotManagerException {
