@@ -5,7 +5,7 @@ import main.java.Simulation;
 import main.java.Sleeper;
 import main.java.logging.LogManager;
 
-public class Robot implements Runnable, Entities, Sleeper {
+public class Robot implements Entities, Sleeper {
 	public enum Status {
 		READY, ERROR, BUSY, WAITING, CHARGING
 	}

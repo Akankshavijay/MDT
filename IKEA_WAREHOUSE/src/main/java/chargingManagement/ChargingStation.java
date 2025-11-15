@@ -6,7 +6,7 @@ import main.java.Sleeper;
 import main.java.logging.LogManager;
 import main.java.robotManagement.Robot;
 
-public class ChargingStation implements Runnable, Entities, Sleeper {
+public class ChargingStation implements Entities, Sleeper {
 
     public enum Status {
         READY, CHARGING, ERROR
