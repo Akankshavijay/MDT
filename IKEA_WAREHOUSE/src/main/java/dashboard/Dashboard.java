@@ -811,7 +811,8 @@ public class Dashboard extends JFrame {
 
 	        Robot r = new Robot(id, x, y, battery, "RobotManager", logger);
 	        robotManager.addRobot(r);
-
+	        r.start();
+	        
 	        logger.log("Dashboard", "Created new Robot " + id + " at (" + x + "," + y + ") battery=" + battery + "%");
 	    } catch (Exception ex) {
 	        JOptionPane.showMessageDialog(this, "Invalid input: " + ex.getMessage());
